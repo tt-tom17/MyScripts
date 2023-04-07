@@ -88,6 +88,7 @@ async function JSON_Umwandeln(JSON_Plan: string, Haltestelle: string) {
             } else {
                 setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Abfahrzeit', geplanteUhrzeit, true);
                 setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Verspätung', false, true);
+                Verspätung= false;
             }
 
             setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Fahrzeug', Fahrzeug, true);
@@ -109,7 +110,7 @@ async function JSON_Umwandeln(JSON_Plan: string, Haltestelle: string) {
                 setState(DP_NSPanel + 'popupNotify.popupNotifySleepTimeout', 0, true);            // number in sekunden 0 = aus
                 setState(DP_NSPanel + 'popupNotify.popupNotifyLayout', 1, true);                        // number 1 oder 2
                 setState(DP_NSPanel + 'popupNotify.popupNotifyInternalName', 'Delay', true);        // string löst den Trigger aus, geschützte Werte sind TasmotaFirmwareUpdate, BerryDriverUpdate, TFTFirmwareUpdate und Wörter die Update enthalten 
-                console.log('popupNotifypage ausgelöst Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Richtung', Richtung);                  
+                console.log('popupNotifypage ausgelöst Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Richtung', + Richtung);                  
             }
 
 
@@ -151,4 +152,7 @@ on(/^fahrplan\.0+\.DepartureTimetable[0-9]+\.JSON/, function (obj) {
     JSON_Umwandeln(obj.id, Haltestellennummer)
 }
 );
+
+
+
 
