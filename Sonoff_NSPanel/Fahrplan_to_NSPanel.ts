@@ -1,4 +1,4 @@
-
+// Version 0.0.2
 // auslesen der Daten aus dem Adapter Fahrplan und zusammenstellen für das Sonoff NSPanel
 // Die Farben für die Notifypage können unter https://nodtem66.github.io/nextion-hmi-color-convert/index.html
 
@@ -58,6 +58,8 @@ async function JSON_Umwandeln(JSON_Plan: string, Haltestelle: string) {
 
         let h = Haltestelle
 
+        Reset_Data(h)
+
         let HaltestellenPlan: any = JSON.parse(getState(JSON_Plan).val);
 
         if (Debug) console.log('Anzahl der Abfahrten Haltestelle ' + (h) + ': ' + HaltestellenPlan.length);
@@ -110,7 +112,7 @@ async function JSON_Umwandeln(JSON_Plan: string, Haltestelle: string) {
                 setState(DP_NSPanel + 'popupNotify.popupNotifySleepTimeout', 0, true);            // number in sekunden 0 = aus
                 setState(DP_NSPanel + 'popupNotify.popupNotifyLayout', 1, true);                        // number 1 oder 2
                 setState(DP_NSPanel + 'popupNotify.popupNotifyInternalName', 'Delay', true);        // string löst den Trigger aus, geschützte Werte sind TasmotaFirmwareUpdate, BerryDriverUpdate, TFTFirmwareUpdate und Wörter die Update enthalten 
-                console.log('popupNotifypage ausgelöst Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Richtung', + Richtung);                  
+                console.log('popupNotifypage ausgelöst Haltestelle ' + (h) + ' Abfahrt ' + String(i) + ' Richtung ', + Richtung);                  
             }
 
 
@@ -128,6 +130,15 @@ async function JSON_Umwandeln(JSON_Plan: string, Haltestelle: string) {
     } catch (err) {
         console.warn('error at function jsonDatenUmwandeln: ' + err.message)
     }
+};
+
+function Reset_Data(Haltestelle:string) {
+    for (let i = 0; i < 6; i++) {
+        setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (Haltestelle) + '.Abfahrt' + String(i) + '.Abfahrzeit', '', true);
+        setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (Haltestelle) + '.Abfahrt' + String(i) + '.Verspätung', false, true);
+        setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (Haltestelle) + '.Abfahrt' + String(i) + '.Fahrzeug', '', true);
+        setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (Haltestelle) + '.Abfahrt' + String(i) + '.Richtung', '', true);
+    };
 };
 
 
