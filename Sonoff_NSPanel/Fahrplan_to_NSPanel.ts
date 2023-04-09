@@ -4,9 +4,9 @@
 
 
 const Inst_Fahrplan: string = 'fahrplan.0.';        // Instanz vom Fahrplan Adapter
-const DP_NSPanel: string = '0_userdata.0.NSPanel.Büro.';        // Standard 0_userdata.0.NSPanel.1.
-const DP_userdata: string = '0_userdata.0.';        // Pafad unter 0_userdata.0
-const DP_AliasNSPanel: string = 'alias.0.';         // Pfad unter alias.0 
+const DP_NSPanel: string = '0_userdata.0.NSPanel.1.';        // Standard 0_userdata.0.NSPanel.1.
+const DP_userdata: string = '0_userdata.0.';        // Pafad unter 0_userdata.0  Automatisch wird "FahrplanAnzeiger.HaltestelleX.AbfahrtX" durch das Script erzeugt
+const DP_AliasNSPanel: string = 'alias.0.';         // Pfad unter alias.0       Automatisch wird "FahrplanAnzeiger.HaltestelleX.AbfahrtX" durch das Script erzeugt
 const AnzahlHaltestellen: number = 3;               // Anzahl der Haltestellen / Anzeigetafeln
 const VerspätungPopup: boolean = true;              // Bei Verspätung soll PopupNotifypage auf dem Panel angezeigt werden
 
