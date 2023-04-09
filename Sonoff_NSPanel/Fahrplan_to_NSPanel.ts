@@ -1,4 +1,4 @@
-// Version 0.0.2
+// Version 0.0.3
 // auslesen der Daten aus dem Adapter Fahrplan und zusammenstellen für das Sonoff NSPanel
 // Die Farben für die Notifypage können unter https://nodtem66.github.io/nextion-hmi-color-convert/index.html
 
@@ -49,6 +49,7 @@ async function JSON_Umwandeln(JSON_Plan: string, Haltestelle: string) {
         let GeplanteAbfahrzeit: string = '';
         let Richtung: string = '';
         let Fahrzeug: string = '';
+        let Fahrzeugnummer: string = '';
         let timedelay: number = 0;
         let Minuten: number = 0;
         let Verspätung: boolean = false;
@@ -78,6 +79,7 @@ async function JSON_Umwandeln(JSON_Plan: string, Haltestelle: string) {
             Richtung = getAttr(Abfahrt, 'direction');
             Fahrzeug = getAttr(Abfahrt, 'line.mode');
             timedelay = getAttr(Abfahrt, 'delay');
+            Fahrzeugnummer = getAttr(Abfahrt, 'line.name');
 
             let Uhrzeit: string = formatDate(AktuelleAbfahrzeit, 'hh:mm');
             let geplanteUhrzeit: string = formatDate(GeplanteAbfahrzeit, 'hh:mm');
@@ -90,13 +92,13 @@ async function JSON_Umwandeln(JSON_Plan: string, Haltestelle: string) {
             } else {
                 setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Abfahrzeit', geplanteUhrzeit, true);
                 setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Verspätung', false, true);
-                Verspätung= false;
+                Verspätung = false;
             }
 
             setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Fahrzeug', Fahrzeug, true);
             setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Richtung', Richtung, true);
 
-            let Notifytext: string = ['Der ' + Fahrzeug + ' nach' ,'\r\n', Richtung, '\r\n', 'planmäßige Abfahrtzeit ' + geplanteUhrzeit, '\r\n', 'fährt aktuell um ' + Uhrzeit + ' ab.', '\r\n', 'Aktuelle Verspätung beträgt ' + Minuten + ' Minuten.'].join('');
+            let Notifytext: string = ['Der ' + Fahrzeugnummer + ' nach', '\r\n', Richtung, '\r\n', 'planmäßige Abfahrtzeit ' + geplanteUhrzeit, '\r\n', 'fährt aktuell um ' + Uhrzeit + ' ab.', '\r\n', 'Aktuelle Verspätung beträgt ' + Minuten + ' Minuten.'].join('');
 
             //Bei Verspätung Daten für PopupNotifypage erzeugen und auslösen
             if (Verspätung && VerspätungPopup) {
@@ -112,7 +114,7 @@ async function JSON_Umwandeln(JSON_Plan: string, Haltestelle: string) {
                 setState(DP_NSPanel + 'popupNotify.popupNotifySleepTimeout', 0, true);            // number in sekunden 0 = aus
                 setState(DP_NSPanel + 'popupNotify.popupNotifyLayout', 1, true);                        // number 1 oder 2
                 setState(DP_NSPanel + 'popupNotify.popupNotifyInternalName', 'Delay', true);        // string löst den Trigger aus, geschützte Werte sind TasmotaFirmwareUpdate, BerryDriverUpdate, TFTFirmwareUpdate und Wörter die Update enthalten 
-                console.log('popupNotifypage ausgelöst Haltestelle ' + (h) + ' Abfahrt ' + String(i) + ' Richtung ', + Richtung);                  
+                console.log('popupNotifypage ausgelöst Haltestelle ' + (h) + ' Abfahrt ' + String(i) + ' Richtung ', + Richtung);
             }
 
 
@@ -123,7 +125,7 @@ async function JSON_Umwandeln(JSON_Plan: string, Haltestelle: string) {
             if (Debug) console.log('Abfahrt: ' + i);
             if (Debug) console.log('Abfahrzeit geplant: ' + GeplanteAbfahrzeit + ' Richtung: ' + Richtung + ' Fahrzeug: ' + Fahrzeug + ' Verspätung in sec: ' + timedelay + ' aktuelle Abfahrzeit: ' + AktuelleAbfahrzeit);
             if (Debug) console.log('Uhrzeit geplant: ' + geplanteUhrzeit + ' aktuelle Uhrzeit: ' + Uhrzeit);
-            if (Debug) console.log('Verspätung: '+ Verspätung + ' popup: ' + VerspätungPopup + ' Minuten: ' + Minuten)
+            if (Debug) console.log('Verspätung: ' + Verspätung + ' popup: ' + VerspätungPopup + ' Minuten: ' + Minuten)
 
         };
 
@@ -132,7 +134,7 @@ async function JSON_Umwandeln(JSON_Plan: string, Haltestelle: string) {
     }
 };
 
-function Reset_Data(Haltestelle:string) {
+function Reset_Data(Haltestelle: string) {
     for (let i = 0; i < 6; i++) {
         setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (Haltestelle) + '.Abfahrt' + String(i) + '.Abfahrzeit', '', true);
         setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (Haltestelle) + '.Abfahrt' + String(i) + '.Verspätung', false, true);
@@ -141,17 +143,6 @@ function Reset_Data(Haltestelle:string) {
     };
 };
 
-
-/*
-let HaltestellenSelector = '[id='+Inst_Fahrplan+'DepartureTimetable*.JSON]' 
-let HaltestellenListe = $(HaltestellenSelector);
-if (Debug) console.log (HaltestellenListe);
-if(HaltestellenListe.length == 0) {
-    console.error(`error result for slector ' ${HaltestellenSelector}'`);
-}else{
-    HaltestellenListe.on(JSON_Umwandeln);
-};
-*/
 
 // fahrplan.0.DepartureTimetableX.JSON
 on(/^fahrplan\.0+\.DepartureTimetable[0-9]+\.JSON/, function (obj) {
