@@ -1,9 +1,8 @@
-// Version 0.0.3
+// Version 1.0.3
 // auslesen der Daten aus dem Adapter Fahrplan und zusammenstellen für das Sonoff NSPanel
 // Die Farben für die Notifypage können unter https://nodtem66.github.io/nextion-hmi-color-convert/index.html
 
 
-const Inst_Fahrplan: string = 'fahrplan.0.';        // Instanz vom Fahrplan Adapter
 const DP_NSPanel: string = '0_userdata.0.NSPanel.1.';        // Standard 0_userdata.0.NSPanel.1.
 const DP_userdata: string = '0_userdata.0.';        // Pafad unter 0_userdata.0  Automatisch wird "FahrplanAnzeiger.HaltestelleX.AbfahrtX" durch das Script erzeugt
 const DP_AliasNSPanel: string = 'alias.0.';         // Pfad unter alias.0       Automatisch wird "FahrplanAnzeiger.HaltestelleX.AbfahrtX" durch das Script erzeugt
@@ -23,12 +22,12 @@ async function Init_Datenpunkte() {
                     await createStateAsync(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.Richtung', 'Hbf', { type: 'string' });
                     await createStateAsync(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.Fahrzeug', 'train', { type: 'string' });
                     await createStateAsync(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.Verspätung', false, { type: 'boolean' });
-                    setObject(DP_AliasNSPanel + 'FahrplanAnzeiger.Haltestelle' + String(h), { type: 'device', common: { role: 'timeTable', name: {de:'Haltestelle ' + String(h), en:'Station ' + String(h) } }, native: {} });
-                    setObject(DP_AliasNSPanel + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i), { type: 'channel', common: { role: 'timeTable', name: {de:'Abfahrt ' + String(i), en:'Departure ' + String(i)} }, native: {} });
-                    await createAliasAsync(DP_AliasNSPanel + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.ACTUAL', DP_userdata + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.Abfahrzeit', true, <iobJS.StateCommon>{ type: 'string', role: 'state', name: {de:'Abfahrzeit', en:'Departure time' }});
-                    await createAliasAsync(DP_AliasNSPanel + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.Richtung', DP_userdata + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.Richtung', true, <iobJS.StateCommon>{ type: 'string', role: 'state', name: {de: 'Richtung', en: 'Direction'} });
-                    await createAliasAsync(DP_AliasNSPanel + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.Fahrzeug', DP_userdata + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.Fahrzeug', true, <iobJS.StateCommon>{ type: 'string', role: 'state', name: {de: 'Fahrzeug', en: 'Vehicle'} });
-                    await createAliasAsync(DP_AliasNSPanel + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.Verspätung', DP_userdata + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.Verspätung', true, <iobJS.StateCommon>{ type: 'boolean', role: 'state', name: {de:'Verspätung', en: 'Delay'} });
+                    setObject(DP_AliasNSPanel + 'FahrplanAnzeiger.Haltestelle' + String(h), { type: 'device', common: { role: 'timeTable', name: { de: 'Haltestelle ' + String(h), en: 'Station ' + String(h) } }, native: {} });
+                    setObject(DP_AliasNSPanel + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i), { type: 'channel', common: { role: 'timeTable', name: { de: 'Abfahrt ' + String(i), en: 'Departure ' + String(i) } }, native: {} });
+                    await createAliasAsync(DP_AliasNSPanel + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.ACTUAL', DP_userdata + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.Abfahrzeit', true, <iobJS.StateCommon>{ type: 'string', role: 'state', name: { de: 'Abfahrzeit', en: 'Departure time' } });
+                    await createAliasAsync(DP_AliasNSPanel + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.Richtung', DP_userdata + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.Richtung', true, <iobJS.StateCommon>{ type: 'string', role: 'state', name: { de: 'Richtung', en: 'Direction' } });
+                    await createAliasAsync(DP_AliasNSPanel + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.Fahrzeug', DP_userdata + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.Fahrzeug', true, <iobJS.StateCommon>{ type: 'string', role: 'state', name: { de: 'Fahrzeug', en: 'Vehicle' } });
+                    await createAliasAsync(DP_AliasNSPanel + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.Verspätung', DP_userdata + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.Verspätung', true, <iobJS.StateCommon>{ type: 'boolean', role: 'state', name: { de: 'Verspätung', en: 'Delay' } });
                     console.log('Fertig')
                 } else {
                     console.log('Datenpunkte vorhanden')
