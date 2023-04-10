@@ -1,13 +1,14 @@
-// Version 1.0.4
+// Version 1.0.5
 // auslesen der Daten aus dem Adapter Fahrplan und zusammenstellen für das Sonoff NSPanel
 // Die Farben für die Notifypage können unter https://nodtem66.github.io/nextion-hmi-color-convert/index.html
 
 
-const DP_NSPanel: string = '0_userdata.0.NSPanel.1.';        // Standard 0_userdata.0.NSPanel.1.
-const DP_userdata: string = '0_userdata.0.';        // Pafad unter 0_userdata.0  Automatisch wird "FahrplanAnzeiger.HaltestelleX.AbfahrtX" durch das Script erzeugt
-const DP_Alias: string = 'alias.0.';         // Pfad unter alias.0       Automatisch wird "FahrplanAnzeiger.HaltestelleX.AbfahrtX" durch das Script erzeugt
-const AnzahlHaltestellen: number = 3;               // Anzahl der Haltestellen / Anzeigetafeln
-const VerspaetungPopup: boolean = true;              // Bei Verspätung soll PopupNotifypage auf dem Panel angezeigt werden
+const DP_NSPanel: string = '0_userdata.0.NSPanel.Flur.';        // Standard 0_userdata.0.NSPanel.1.
+const DP_userdata: string = '0_userdata.0.NSPanel.Allgemein.';        // Pafad unter 0_userdata.0  Automatisch wird "FahrplanAnzeiger.HaltestelleX.AbfahrtX" durch das Script erzeugt
+const DP_Alias: string = 'alias.0.NSPanel.allgemein.';         // Pfad unter alias.0       Automatisch wird "FahrplanAnzeiger.HaltestelleX.AbfahrtX" durch das Script erzeugt
+const AnzahlHaltestellen: number = 1;               // Anzahl der Haltestellen / Anzeigetafeln
+const VerspaetungPopup: boolean = true;             // Bei Verspätung soll PopupNotifypage auf dem Panel angezeigt werden
+const Verspaetungszeit:number = 300;                // Verspätungszeit 
 
 const Debug = false;
 
@@ -51,7 +52,6 @@ async function JSON_Umwandeln(JSON_Plan: string, Haltestelle: string) {
         let Fahrzeugnummer: string = '';
         let timedelay: number = 0;
         let Minuten: number = 0;
-        let Verspaetung: boolean = false;
 
 
         //if (Debug) console.log(getState(JSON_Plan).val);
@@ -86,12 +86,10 @@ async function JSON_Umwandeln(JSON_Plan: string, Haltestelle: string) {
             if (timedelay > 0 && timedelay != null) {
                 setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Abfahrzeit', Uhrzeit, true);
                 setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Verspätung', true, true);
-                Verspaetung = true;
                 Minuten = Math.round(timedelay / 60)
             } else {
                 setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Abfahrzeit', geplanteUhrzeit, true);
                 setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Verspätung', false, true);
-                Verspaetung = false;
             }
 
             setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Fahrzeug', Fahrzeug, true);
@@ -100,7 +98,7 @@ async function JSON_Umwandeln(JSON_Plan: string, Haltestelle: string) {
             let Notifytext: string = ['Der ' + Fahrzeugnummer + ' nach', '\r\n', Richtung, '\r\n', 'planmäßige Abfahrtzeit ' + geplanteUhrzeit, '\r\n', 'fährt aktuell um ' + Uhrzeit + ' ab.', '\r\n', 'Aktuelle Verspätung beträgt ' + Minuten + ' Minuten.'].join('');
 
             //Bei Verspätung Daten für PopupNotifypage erzeugen und auslösen
-            if (Verspaetung && VerspaetungPopup) {
+            if (timedelay > Verspaetungszeit && VerspaetungPopup) {
                 setState(DP_NSPanel + 'popupNotify.popupNotifyHeading', 'Verspätung', true);                 // string
                 setState(DP_NSPanel + 'popupNotify.popupNotifyHeadingColor', '63488', true);            // string
                 setState(DP_NSPanel + 'popupNotify.popupNotifyIcon', Fahrzeug, true);                    // string muss aus der iconMapping.ts sein
@@ -124,7 +122,7 @@ async function JSON_Umwandeln(JSON_Plan: string, Haltestelle: string) {
             if (Debug) console.log('Abfahrt: ' + i);
             if (Debug) console.log('Abfahrzeit geplant: ' + GeplanteAbfahrzeit + ' Richtung: ' + Richtung + ' Fahrzeug: ' + Fahrzeug + ' Verspätung in sec: ' + timedelay + ' aktuelle Abfahrzeit: ' + AktuelleAbfahrzeit);
             if (Debug) console.log('Uhrzeit geplant: ' + geplanteUhrzeit + ' aktuelle Uhrzeit: ' + Uhrzeit);
-            if (Debug) console.log('Verspätung: ' + Verspaetung + ' popup: ' + VerspaetungPopup + ' Minuten: ' + Minuten)
+            if (Debug) console.log('Popup: ' + VerspaetungPopup + ' Minuten: ' + Minuten)
 
         };
 
@@ -153,7 +151,3 @@ on(/^fahrplan\.0+\.DepartureTimetable[0-9]+\.JSON/, function (obj) {
     JSON_Umwandeln(obj.id, Haltestellennummer)
 }
 );
-
-
-
-
