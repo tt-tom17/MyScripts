@@ -8,7 +8,7 @@ const DP_userdata: string = '0_userdata.0.NSPanel.Allgemein.';        // Pafad u
 const DP_Alias: string = 'alias.0.NSPanel.allgemein.';         // Pfad unter alias.0       Automatisch wird "FahrplanAnzeiger.HaltestelleX.AbfahrtX" durch das Script erzeugt
 const AnzahlHaltestellen: number = 1;               // Anzahl der Haltestellen / Anzeigetafeln
 const VerspaetungPopup: boolean = true;             // Bei Verspätung soll PopupNotifypage auf dem Panel angezeigt werden
-const Verspaetungszeit:number = 300;                // Verspätungszeit 
+const Verspaetungszeit:number = 300;                // Verspätungszeit in sekunden
 
 const Debug = false;
 
