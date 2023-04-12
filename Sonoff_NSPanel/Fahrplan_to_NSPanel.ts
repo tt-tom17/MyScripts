@@ -1,4 +1,4 @@
-// Version 1.0.6
+// Version 1.0.7
 // auslesen der Daten aus dem Adapter Fahrplan und zusammenstellen für das Sonoff NSPanel
 // Die Farben für die Notifypage können unter https://nodtem66.github.io/nextion-hmi-color-convert/index.html
 
@@ -53,79 +53,84 @@ async function JSON_Umwandeln(JSON_Plan: string, Haltestelle: string) {
         let timedelay: number = 0;
         let Minuten: number = 0;
 
-
-        //if (Debug) console.log(getState(JSON_Plan).val);
-
         let h = Haltestelle
 
-        Reset_Data(h)
+        if (parseInt(h) >= AnzahlHaltestellen) {
+            console.log('Es werden Daten nur von ' + AnzahlHaltestellen + ' Haltestelle/n ausgewertet. Der Fahrplan-Adapter liefert aber mehr Daten. Ggf die Anzahl der Haltestellen im Script erhöhen.');
+        } else {
 
-        let HaltestellenPlan: any = JSON.parse(getState(JSON_Plan).val);
 
-        if (Debug) console.log('Anzahl der Abfahrten Haltestelle ' + (h) + ': ' + HaltestellenPlan.length);
+            if (Debug) console.log(getState(JSON_Plan).val);
 
-        for (let i = 0; i < HaltestellenPlan.length; i++) {
+            Reset_Data(h)
 
-            if (i == 6) {
-                console.warn('Es werden nur die ersten 6 Abfahrten pro Haltestelle eingelesen');
-                break;
+            let HaltestellenPlan: any = JSON.parse(getState(JSON_Plan).val);
+
+            if (Debug) console.log('Anzahl der Abfahrten Haltestelle ' + (h) + ': ' + HaltestellenPlan.length);
+
+            for (let i = 0; i < HaltestellenPlan.length; i++) {
+
+                if (i == 6) {
+                    console.warn('Es werden nur die ersten 6 Abfahrten pro Haltestelle eingelesen');
+                    break;
+                };
+
+                const Abfahrt = HaltestellenPlan[i];
+
+                AktuelleAbfahrzeit = getAttr(Abfahrt, 'when');
+                GeplanteAbfahrzeit = getAttr(Abfahrt, 'plannedWhen')
+                Richtung = getAttr(Abfahrt, 'direction');
+                Fahrzeug = getAttr(Abfahrt, 'line.mode');
+                timedelay = getAttr(Abfahrt, 'delay');
+                Fahrzeugnummer = getAttr(Abfahrt, 'line.name');
+
+                let Uhrzeit: string = formatDate(AktuelleAbfahrzeit, 'hh:mm');
+                let geplanteUhrzeit: string = formatDate(GeplanteAbfahrzeit, 'hh:mm');
+
+                if (timedelay > 0 && timedelay != null) {
+                    setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Abfahrzeit', Uhrzeit, true);
+                    setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Verspätung', true, true);
+                    Minuten = Math.round(timedelay / 60)
+                } else {
+                    setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Abfahrzeit', geplanteUhrzeit, true);
+                    setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Verspätung', false, true);
+                }
+
+                setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Fahrzeug', Fahrzeug, true);
+                setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Richtung', Richtung, true);
+
+                let Notifytext: string = ['Der ' + Fahrzeugnummer + ' nach', '\r\n', Richtung, '\r\n', 'planmäßige Abfahrtzeit ' + geplanteUhrzeit, '\r\n', 'fährt aktuell um ' + Uhrzeit + ' ab.', '\r\n', 'Aktuelle Verspätung beträgt ' + Minuten + ' Minuten.'].join('');
+
+                //Bei Verspätung Daten für PopupNotifypage erzeugen und auslösen
+                if (timedelay > Verspaetungszeit && VerspaetungPopup) {
+                    setState(DP_NSPanel + 'popupNotify.popupNotifyHeading', 'Verspätung', true);                 // string
+                    setState(DP_NSPanel + 'popupNotify.popupNotifyHeadingColor', '63488', true);            // string
+                    setState(DP_NSPanel + 'popupNotify.popupNotifyIcon', Fahrzeug, true);                    // string muss aus der iconMapping.ts sein
+                    setState(DP_NSPanel + 'popupNotify.popupNotifyIconColor', '65504', true);               // string 
+                    setState(DP_NSPanel + 'popupNotify.popupNotifyFontIdText', 1, true);                  // number 1-5
+                    setState(DP_NSPanel + 'popupNotify.popupNotifyText', Notifytext, true);                    // string
+                    setState(DP_NSPanel + 'popupNotify.popupNotifyTextColor', '65535', true);               // string
+                    setState(DP_NSPanel + 'popupNotify.popupNotifyButton1Text', 'OK', true);                 // string
+                    setState(DP_NSPanel + 'popupNotify.popupNotifyButton1TextColor', '9507', true);        // string  rgb_dec565 Code von 0 bis 65535
+                    setState(DP_NSPanel + 'popupNotify.popupNotifyButton2Text', '', true);                 // string
+                    setState(DP_NSPanel + 'popupNotify.popupNotifyButton2TextColor', '9507', true);        // string  rgb_dec565 Code von 0 bis 65535               
+                    setState(DP_NSPanel + 'popupNotify.popupNotifySleepTimeout', 0, true);            // number in sekunden 0 = aus
+                    setState(DP_NSPanel + 'popupNotify.popupNotifyLayout', 1, true);                        // number 1 oder 2
+                    setState(DP_NSPanel + 'popupNotify.popupNotifyInternalName', 'Delay', true);        // string löst den Trigger aus, geschützte Werte sind TasmotaFirmwareUpdate, BerryDriverUpdate, TFTFirmwareUpdate und Wörter die Update enthalten 
+                    console.log('popupNotifypage ausgelöst Haltestelle ' + (h) + ' Abfahrt ' + String(i) + ' Richtung ' + Richtung);
+                }
+
+
+
+
+
+
+                if (Debug) console.log('Abfahrt: ' + i);
+                if (Debug) console.log('Abfahrzeit geplant: ' + GeplanteAbfahrzeit + ' Richtung: ' + Richtung + ' Fahrzeug: ' + Fahrzeug + ' Verspätung in sec: ' + timedelay + ' aktuelle Abfahrzeit: ' + AktuelleAbfahrzeit);
+                if (Debug) console.log('Uhrzeit geplant: ' + geplanteUhrzeit + ' aktuelle Uhrzeit: ' + Uhrzeit);
+                if (Debug) console.log('Popup: ' + VerspaetungPopup + ' Minuten: ' + Minuten)
+
             };
-
-            const Abfahrt = HaltestellenPlan[i];
-
-            AktuelleAbfahrzeit = getAttr(Abfahrt, 'when');
-            GeplanteAbfahrzeit = getAttr(Abfahrt, 'plannedWhen')
-            Richtung = getAttr(Abfahrt, 'direction');
-            Fahrzeug = getAttr(Abfahrt, 'line.mode');
-            timedelay = getAttr(Abfahrt, 'delay');
-            Fahrzeugnummer = getAttr(Abfahrt, 'line.name');
-
-            let Uhrzeit: string = formatDate(AktuelleAbfahrzeit, 'hh:mm');
-            let geplanteUhrzeit: string = formatDate(GeplanteAbfahrzeit, 'hh:mm');
-
-            if (timedelay > 0 && timedelay != null) {
-                setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Abfahrzeit', Uhrzeit, true);
-                setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Verspätung', true, true);
-                Minuten = Math.round(timedelay / 60)
-            } else {
-                setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Abfahrzeit', geplanteUhrzeit, true);
-                setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Verspätung', false, true);
-            }
-
-            setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Fahrzeug', Fahrzeug, true);
-            setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Richtung', Richtung, true);
-
-            let Notifytext: string = ['Der ' + Fahrzeugnummer + ' nach', '\r\n', Richtung, '\r\n', 'planmäßige Abfahrtzeit ' + geplanteUhrzeit, '\r\n', 'fährt aktuell um ' + Uhrzeit + ' ab.', '\r\n', 'Aktuelle Verspätung beträgt ' + Minuten + ' Minuten.'].join('');
-
-            //Bei Verspätung Daten für PopupNotifypage erzeugen und auslösen
-            if (timedelay > Verspaetungszeit && VerspaetungPopup) {
-                setState(DP_NSPanel + 'popupNotify.popupNotifyHeading', 'Verspätung', true);                 // string
-                setState(DP_NSPanel + 'popupNotify.popupNotifyHeadingColor', '63488', true);            // string
-                setState(DP_NSPanel + 'popupNotify.popupNotifyIcon', Fahrzeug, true);                    // string muss aus der iconMapping.ts sein
-                setState(DP_NSPanel + 'popupNotify.popupNotifyIconColor', '65504', true);               // string 
-                setState(DP_NSPanel + 'popupNotify.popupNotifyFontIdText', 1, true);                  // number 1-5
-                setState(DP_NSPanel + 'popupNotify.popupNotifyText', Notifytext, true);                    // string
-                setState(DP_NSPanel + 'popupNotify.popupNotifyTextColor', '65535', true);               // string
-                setState(DP_NSPanel + 'popupNotify.popupNotifyButton1Text', 'OK', true);                 // string
-                setState(DP_NSPanel + 'popupNotify.popupNotifyButton1TextColor', '9507', true);        // string  rgb_dec565 Code von 0 bis 65535
-                setState(DP_NSPanel + 'popupNotify.popupNotifyButton2Text', '', true);                 // string
-                setState(DP_NSPanel + 'popupNotify.popupNotifyButton2TextColor', '9507', true);        // string  rgb_dec565 Code von 0 bis 65535               
-                setState(DP_NSPanel + 'popupNotify.popupNotifySleepTimeout', 0, true);            // number in sekunden 0 = aus
-                setState(DP_NSPanel + 'popupNotify.popupNotifyLayout', 1, true);                        // number 1 oder 2
-                setState(DP_NSPanel + 'popupNotify.popupNotifyInternalName', 'Delay', true);        // string löst den Trigger aus, geschützte Werte sind TasmotaFirmwareUpdate, BerryDriverUpdate, TFTFirmwareUpdate und Wörter die Update enthalten 
-                console.log('popupNotifypage ausgelöst Haltestelle ' + (h) + ' Abfahrt ' + String(i) + ' Richtung ' + Richtung);
-            }
-
-
-
-
-
-
-            if (Debug) console.log('Abfahrt: ' + i);
-            if (Debug) console.log('Abfahrzeit geplant: ' + GeplanteAbfahrzeit + ' Richtung: ' + Richtung + ' Fahrzeug: ' + Fahrzeug + ' Verspätung in sec: ' + timedelay + ' aktuelle Abfahrzeit: ' + AktuelleAbfahrzeit);
-            if (Debug) console.log('Uhrzeit geplant: ' + geplanteUhrzeit + ' aktuelle Uhrzeit: ' + Uhrzeit);
-            if (Debug) console.log('Popup: ' + VerspaetungPopup + ' Minuten: ' + Minuten)
-
         };
 
     } catch (err) {
