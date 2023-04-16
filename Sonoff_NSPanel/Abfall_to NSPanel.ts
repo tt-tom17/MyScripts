@@ -1,5 +1,5 @@
 /*
-Version 4.0 von TT-Tom
+Version 4.0.1 von TT-Tom
 das Script erstellt die Datenpunkte und Alias für den Abfallkalender im Sonoff NSPanel
 Es wird der iCal Adapter benötigt und eine URL mit Terminen vom Entsorger bzw. eine .ics-Datei mit den Terminen.
 gleichzeitig triggert das Script auf dem bereitgestellten JSON im iCal adapter und füllt die 0_userdata.0 Datenpunkte
@@ -27,39 +27,34 @@ on({ id: idAbfalliCal + '.data.table', change: 'ne' }, async function () {
 
     try {
 
-        let Muell_JSON: any;
-        let Event2: string;
-        let Color: number = 0;
+        let muell_JSON: any;
+        let eventName: string;
+        let farbNummer: number = 0;
 
         for (let i = 1; i <= 4; i++) {
-            Muell_JSON = getState(idAbfalliCal + '.data.table').val;
-            setState(idUserdataAbfallVerzeichnis + '.' + String(i) + '.date', getAttr(Muell_JSON, (String(i - 1) + '.date')));
-            Event2 = subsequenceFromStartLast(getAttr(Muell_JSON, (String(i - 1) + '.event')), idZeichenLoeschen);
-            setState(idUserdataAbfallVerzeichnis + '.' + String(i) + '.event', Event2);
+            muell_JSON = getState(idAbfalliCal + '.data.table').val;
+            setState(idUserdataAbfallVerzeichnis + '.' + String(i) + '.date', getAttr(muell_JSON, (String(i - 1) + '.date')));
+            eventName = getAttr(muell_JSON, (String(i - 1) + '.event')).slice(idZeichenLoeschen, getAttr(muell_JSON, (String(i - 1) + '.event')).length);
+            setState(idUserdataAbfallVerzeichnis + '.' + String(i) + '.event', eventName);
 
-            if (Debug) console.log('%' + Event2 + '%')
+            if (Debug) console.log('%' + eventName + '%')
 
-            if (Event2 == idRestmuellName) {
-                Color = 33840;
-            } else if (Event2 == idBioabfaelleName) {
-                Color = 2016;
-            } else if (Event2 == idPappePapierName) {
-                Color = 31;
-            } else if (Event2 == idWertstoffName) {
-                Color = 65504;
+            if (eventName == idRestmuellName) {
+                farbNummer = 33840;
+            } else if (eventName == idBioabfaelleName) {
+                farbNummer = 2016;
+            } else if (eventName == idPappePapierName) {
+                farbNummer = 31;
+            } else if (eventName == idWertstoffName) {
+                farbNummer = 65504;
             }
-            setState(idUserdataAbfallVerzeichnis + '.' + String(i) + '.color', Color);
+            setState(idUserdataAbfallVerzeichnis + '.' + String(i) + '.color', farbNummer);
         }
     } catch (err) {
         console.warn('error at subscrption: ' + err.message);
     }
 });
 
-function subsequenceFromStartLast(sequence, at1) {
-    var start = at1;
-    var end = sequence.length;
-    return sequence.slice(start, end);
-};
 // ------------------------------------- Ende Trigger ------------------------------------
 
 // ------------------------------------- Funktionen zur Prüfung und Erstellung der Datenpunkte in 0_userdata.0 und alias.0 -----------------------
