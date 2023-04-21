@@ -1,9 +1,19 @@
 /*
-Version 4.0.1 von TT-Tom
-das Script erstellt die Datenpunkte und Alias für den Abfallkalender im Sonoff NSPanel
-Es wird der iCal Adapter benötigt und eine URL mit Terminen vom Entsorger bzw. eine .ics-Datei mit den Terminen.
-gleichzeitig triggert das Script auf dem bereitgestellten JSON im iCal adapter und füllt die 0_userdata.0 Datenpunkte
-Weitere Informationen findest du in der FAQ auf Github https://github.com/joBr99/nspanel-lovelace-ui/wiki
+ * @author 2023 @tt-tom
+ *
+ * Dieses Skript dient zur freien Verwendung in ioBroker zur Überprüfung Deiner Internetgeschwindkeit mit Hilfe von Speedtest.
+ * Jegliche Verantwortung liegt beim Benutzer. Das Skript wurde unter Berücksichtigung der bestmöglichen Nutzung
+ * und Performance entwickelt.
+ * Der Entwickler versichert, das keine böswilligen Systemeingriffe im originalen Skript vorhanden sind.
+ *
+ * Ansprüche gegenüber Dritten bestehen nicht.
+ * 
+ * Version 4.0.1
+ * 
+ * Das Script erstellt die Datenpunkte und Alias für den Abfallkalender im Sonoff NSPanel
+ * Es wird der iCal Adapter benötigt und eine URL mit Terminen vom Entsorger bzw. eine .ics-Datei mit den Terminen.
+ * Das Script triggert auf dem bereitgestellten JSON im iCal adapter und füllt die 0_userdata.0 Datenpunkte
+ * Weitere Informationen findest du in der FAQ auf Github https://github.com/joBr99/nspanel-lovelace-ui/wiki
 */
 
 

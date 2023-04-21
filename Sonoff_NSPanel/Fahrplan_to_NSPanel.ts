@@ -1,7 +1,18 @@
-// Version 1.0.7
-// auslesen der Daten aus dem Adapter Fahrplan und zusammenstellen für das Sonoff NSPanel
-// Die Farben für die Notifypage können unter https://nodtem66.github.io/nextion-hmi-color-convert/index.html
-
+/*
+ * @author 2023 @tt-tom
+ *
+ * Dieses Skript dient zur freien Verwendung in ioBroker zur Überprüfung Deiner Internetgeschwindkeit mit Hilfe von Speedtest.
+ * Jegliche Verantwortung liegt beim Benutzer. Das Skript wurde unter Berücksichtigung der bestmöglichen Nutzung
+ * und Performance entwickelt.
+ * Der Entwickler versichert, das keine böswilligen Systemeingriffe im originalen Skript vorhanden sind.
+ *
+ * Ansprüche gegenüber Dritten bestehen nicht.
+ * 
+ * Version 1.0.7
+ * 
+ * auslesen der Daten aus dem Adapter Fahrplan und zusammenstellen für das Sonoff NSPanel
+ * Die Farben für die Notifypage können unter https://nodtem66.github.io/nextion-hmi-color-convert/index.html
+*/
 
 const DP_NSPanel: string = '0_userdata.0.NSPanel.1.';        // Standard 0_userdata.0.NSPanel.1.
 const DP_userdata: string = '0_userdata.0.NSPanel.';        // Pafad unter 0_userdata.0  Automatisch wird "FahrplanAnzeiger.HaltestelleX.AbfahrtX" durch das Script erzeugt
