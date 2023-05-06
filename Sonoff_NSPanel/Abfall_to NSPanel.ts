@@ -28,7 +28,7 @@ const idWertstoffName: string = 'Gelber Sack'; // Gelbe Tonne / Sack
 const idPappePapierName: string = 'Papier';  // Blaue Tonne
 const idBioabfaelleName: string = 'Biomüll'; // Braune Tonne
 
-const Debug: boolean = true;
+const Debug: boolean = false;
 
 // ------------------------- Trigger zum füllen der 0_userdata Datenpunkte aus dem json vom ical Adapter -------------------------------
 
