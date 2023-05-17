@@ -8,7 +8,7 @@
  *
  * Ansprüche gegenüber Dritten bestehen nicht.
  * 
- * Version 1.0.7
+ * Version 1.0.8
  * 
  * auslesen der Daten aus dem Adapter Fahrplan und zusammenstellen für das Sonoff NSPanel
  * Die Farben für die Notifypage können unter https://nodtem66.github.io/nextion-hmi-color-convert/index.html
@@ -113,21 +113,26 @@ async function JSON_Umwandeln(JSON_Plan: string, Haltestelle: string) {
                 let Notifytext: string = ['Der ' + Fahrzeugnummer + ' nach', '\r\n', Richtung, '\r\n', 'planmäßige Abfahrtzeit ' + geplanteUhrzeit, '\r\n', 'fährt aktuell um ' + Uhrzeit + ' ab.', '\r\n', 'Aktuelle Verspätung beträgt ' + Minuten + ' Minuten.'].join('');
 
                 //Bei Verspätung Daten für PopupNotifypage erzeugen und auslösen
-                if (timedelay > Verspaetungszeit && VerspaetungPopup) {
+                if (Timedelay > Verspaetungszeit && VerspaetungPopup) {
+                    setState(DP_NSPanel + 'popupNotify.popupNotifySleepTimeout', 0, true);            // number in sekunden 0 = aus
+                    setState(DP_NSPanel + 'popupNotify.popupNotifyLayout', 1, true);                        // number 1 oder 2
+                    setState(DP_NSPanel + 'popupNotify.popupNotifyInternalName', 'DelayFahrplanScript', true);        // string löst den Trigger aus, geschützte Werte sind TasmotaFirmwareUpdate, BerryDriverUpdate, TFTFirmwareUpdate und Wörter die Update enthalten 
+
                     setState(DP_NSPanel + 'popupNotify.popupNotifyHeading', 'Verspätung', true);                 // string
                     setState(DP_NSPanel + 'popupNotify.popupNotifyHeadingColor', '63488', true);            // string
+
                     setState(DP_NSPanel + 'popupNotify.popupNotifyIcon', Fahrzeug, true);                    // string muss aus der iconMapping.ts sein
                     setState(DP_NSPanel + 'popupNotify.popupNotifyIconColor', '65504', true);               // string 
-                    setState(DP_NSPanel + 'popupNotify.popupNotifyFontIdText', 1, true);                  // number 1-5
-                    setState(DP_NSPanel + 'popupNotify.popupNotifyText', Notifytext, true);                    // string
-                    setState(DP_NSPanel + 'popupNotify.popupNotifyTextColor', '65535', true);               // string
+
                     setState(DP_NSPanel + 'popupNotify.popupNotifyButton1Text', 'OK', true);                 // string
                     setState(DP_NSPanel + 'popupNotify.popupNotifyButton1TextColor', '9507', true);        // string  rgb_dec565 Code von 0 bis 65535
                     setState(DP_NSPanel + 'popupNotify.popupNotifyButton2Text', '', true);                 // string
                     setState(DP_NSPanel + 'popupNotify.popupNotifyButton2TextColor', '9507', true);        // string  rgb_dec565 Code von 0 bis 65535               
-                    setState(DP_NSPanel + 'popupNotify.popupNotifySleepTimeout', 0, true);            // number in sekunden 0 = aus
-                    setState(DP_NSPanel + 'popupNotify.popupNotifyLayout', 1, true);                        // number 1 oder 2
-                    setState(DP_NSPanel + 'popupNotify.popupNotifyInternalName', 'Delay', true);        // string löst den Trigger aus, geschützte Werte sind TasmotaFirmwareUpdate, BerryDriverUpdate, TFTFirmwareUpdate und Wörter die Update enthalten 
+
+                    setState(DP_NSPanel + 'popupNotify.popupNotifyFontIdText', 1, true);                  // number 1-5
+                    setState(DP_NSPanel + 'popupNotify.popupNotifyTextColor', '65535', true);               // string
+                    setState(DP_NSPanel + 'popupNotify.popupNotifyText', Notifytext, true);                    // string muss als letztes gefüllt werden, wegen Trigger im PanelScript
+
                     console.log('popupNotifypage ausgelöst Haltestelle ' + (h) + ' Abfahrt ' + String(i) + ' Richtung ' + Richtung);
                 }
 
