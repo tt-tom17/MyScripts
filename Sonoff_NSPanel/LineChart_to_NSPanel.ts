@@ -44,7 +44,7 @@ const historyInstance: string = 'history.0';
 
 const Debug = false;
 
-const maxX = 1420;
+const maxX = 1380;  // max Länge der X Achse, ein vielfaches von xAchseStrich
 const limitMeasurements = 35;
 
 async function Init_Datenpunkte() {
