@@ -44,7 +44,7 @@ const historyInstance: string = 'history.0';
 
 const Debug = false;
 
-const maxX = 1380;  // max Länge der X Achse, ein vielfaches von xAchseStrich
+const maxX = 1420;  // max Länge der X Achse, ein vielfaches von xAchseStrich
 const limitMeasurements = 35;
 
 async function Init_Datenpunkte() {
@@ -91,7 +91,7 @@ on({ id: sourceDP, change: "any" }, async function (obj) {
         let ts = Math.round(date.getTime() / 1000);
         let tsYesterday = ts - (zeitSpanne * 3600);
 
-        for (let x = tsYesterday, i = 0; x < ts; x += (xAchseStrich * 60), i += xAchseStrich) {
+        for (let x = tsYesterday, i = 0; x < ts + 60; x += (xAchseStrich * 60), i += xAchseStrich) {
             if (i % xAchseWert) {
                 ticksAndLabelsList.push(String(i));
             } else {
