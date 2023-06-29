@@ -8,7 +8,7 @@
  *
  * Ansprüche gegenüber Dritten bestehen nicht.
  * 
- * Version 1.0.8
+ * Version 1.0.9
  * 
  * auslesen der Daten aus dem Adapter Fahrplan und zusammenstellen für das Sonoff NSPanel
  * Die Farben für die Notifypage können unter https://nodtem66.github.io/nextion-hmi-color-convert/index.html
@@ -19,7 +19,8 @@ const DP_userdata: string = '0_userdata.0.NSPanel.';        // Pafad unter 0_use
 const DP_Alias: string = 'alias.0.NSPanel.';         // Pfad unter alias.0       Automatisch wird "FahrplanAnzeiger.HaltestelleX.AbfahrtX" durch das Script erzeugt
 const AnzahlHaltestellen: number = 1;               // Anzahl der Haltestellen / Anzeigetafeln
 const VerspaetungPopup: boolean = true;             // Bei Verspätung soll PopupNotifypage auf dem Panel angezeigt werden
-const Verspaetungszeit: number = 300;                // Verspätungszeit 
+const Verspaetungszeit: number = 300;               // Verspätungszeit 
+let Info: string = '';
 
 const Debug = false;
 
@@ -61,7 +62,7 @@ async function JSON_Umwandeln(JSON_Plan: string, Haltestelle: string) {
         let Richtung: string = '';
         let Fahrzeug: string = '';
         let Fahrzeugnummer: string = '';
-        let timedelay: number = 0;
+        let Timedelay: number = 0;
         let Minuten: number = 0;
 
         let h = Haltestelle
@@ -92,16 +93,32 @@ async function JSON_Umwandeln(JSON_Plan: string, Haltestelle: string) {
                 GeplanteAbfahrzeit = getAttr(Abfahrt, 'plannedWhen')
                 Richtung = getAttr(Abfahrt, 'direction');
                 Fahrzeug = getAttr(Abfahrt, 'line.mode');
-                timedelay = getAttr(Abfahrt, 'delay');
+                Timedelay = getAttr(Abfahrt, 'delay');
                 Fahrzeugnummer = getAttr(Abfahrt, 'line.name');
+
+                let Bemerkungen = getAttr(Abfahrt, 'remarks');
+                    Info = '';
+
+                for (let t = 0; t < Bemerkungen.length; t++) {
+                    if (getAttr(Bemerkungen[t], 'type') == 'status') {
+                        Info += getAttr(Bemerkungen[t], 'text');
+                        Info += ' ';
+                    };
+                };
+                if (Info != '') {
+                    console.log(Info);
+                    setState(DP_NSPanel + 'popupNotify.popupNotifyInternalName', 'DelayFahrplanScript', true);
+                   // setState(DP_NSPanel + 'popupNotify.popupNotifyText', [Info.substring(0, 44), Info.substring(45, 90)].join('\n'), true);
+                    setState(DP_NSPanel + 'popupNotify.popupNotifyText', Info, true);
+                };
 
                 let Uhrzeit: string = formatDate(AktuelleAbfahrzeit, 'hh:mm');
                 let geplanteUhrzeit: string = formatDate(GeplanteAbfahrzeit, 'hh:mm');
 
-                if (timedelay > 0 && timedelay != null) {
+                if (Timedelay > 0 && Timedelay != null) {
                     setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Abfahrzeit', Uhrzeit, true);
                     setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Verspätung', true, true);
-                    Minuten = Math.round(timedelay / 60)
+                    Minuten = Math.round(Timedelay / 60)
                 } else {
                     setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Abfahrzeit', geplanteUhrzeit, true);
                     setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Verspätung', false, true);
@@ -114,7 +131,7 @@ async function JSON_Umwandeln(JSON_Plan: string, Haltestelle: string) {
 
                 //Bei Verspätung Daten für PopupNotifypage erzeugen und auslösen
                 if (Timedelay > Verspaetungszeit && VerspaetungPopup) {
-                    setState(DP_NSPanel + 'popupNotify.popupNotifySleepTimeout', 0, true);            // number in sekunden 0 = aus
+                    setState(DP_NSPanel + 'popupNotify.popupNotifySleepTimeout', 600, true);            // number in sekunden 0 = aus
                     setState(DP_NSPanel + 'popupNotify.popupNotifyLayout', 1, true);                        // number 1 oder 2
                     setState(DP_NSPanel + 'popupNotify.popupNotifyInternalName', 'DelayFahrplanScript', true);        // string löst den Trigger aus, geschützte Werte sind TasmotaFirmwareUpdate, BerryDriverUpdate, TFTFirmwareUpdate und Wörter die Update enthalten 
 
@@ -126,7 +143,7 @@ async function JSON_Umwandeln(JSON_Plan: string, Haltestelle: string) {
 
                     setState(DP_NSPanel + 'popupNotify.popupNotifyButton1Text', 'OK', true);                 // string
                     setState(DP_NSPanel + 'popupNotify.popupNotifyButton1TextColor', '9507', true);        // string  rgb_dec565 Code von 0 bis 65535
-                    setState(DP_NSPanel + 'popupNotify.popupNotifyButton2Text', '', true);                 // string
+                    setState(DP_NSPanel + 'popupNotify.popupNotifyButton2Text', 'Info', true);                 // string
                     setState(DP_NSPanel + 'popupNotify.popupNotifyButton2TextColor', '9507', true);        // string  rgb_dec565 Code von 0 bis 65535               
 
                     setState(DP_NSPanel + 'popupNotify.popupNotifyFontIdText', 1, true);                  // number 1-5
@@ -142,7 +159,7 @@ async function JSON_Umwandeln(JSON_Plan: string, Haltestelle: string) {
 
 
                 if (Debug) console.log('Abfahrt: ' + i);
-                if (Debug) console.log('Abfahrzeit geplant: ' + GeplanteAbfahrzeit + ' Richtung: ' + Richtung + ' Fahrzeug: ' + Fahrzeug + ' Verspätung in sec: ' + timedelay + ' aktuelle Abfahrzeit: ' + AktuelleAbfahrzeit);
+                if (Debug) console.log('Abfahrzeit geplant: ' + GeplanteAbfahrzeit + ' Richtung: ' + Richtung + ' Fahrzeug: ' + Fahrzeug + ' Verspätung in sec: ' + Timedelay + ' aktuelle Abfahrzeit: ' + AktuelleAbfahrzeit);
                 if (Debug) console.log('Uhrzeit geplant: ' + geplanteUhrzeit + ' aktuelle Uhrzeit: ' + Uhrzeit);
                 if (Debug) console.log('Popup: ' + VerspaetungPopup + ' Minuten: ' + Minuten)
 
@@ -174,3 +191,31 @@ on(/^fahrplan\.0+\.DepartureTimetable[0-9]+\.JSON/, function (obj) {
     JSON_Umwandeln(obj.id, Haltestellennummer)
 }
 );
+// Trigger für Button Rückmeldung / Panel Script trigger auf den selben Pfad, darum zwingende Abfrage des popupNotifyInternalName
+on({ id: DP_NSPanel + 'popupNotify.popupNotifyAction', change: 'any' }, async function (obj) {
+    try {
+        const val = obj.state ? obj.state.val : false;
+        if (!val) {
+            if (Debug) console.log('Es wurde Button1 gedrückt');
+        } else if (val) {
+
+            const internalName: string = getState(DP_NSPanel + 'popupNotify.popupNotifyInternalName').val;
+            if (internalName.includes('Delay')) {
+                if (internalName == 'DelayFahrplanScript') {
+                    console.log('jetzt kommmt Text 2' + Info + '%');
+                    setTimeout(function () {
+                        setState(DP_NSPanel + 'popupNotify.popupNotifySleepTimeout', 60, true);
+                        setState(DP_NSPanel + 'popupNotify.popupNotifyInternalName', 'DelayFahrplanScript', true);
+                        setState(DP_NSPanel + 'popupNotify.popupNotifyText', Info.substring(91, Info.length), true);
+                        setState(DP_NSPanel + 'popupNotify.popupNotifyButton2Text', '', true);
+                    }, 1000);
+
+                };
+            };
+            if (Debug) console.log('Es wurde Button2 gedrückt');
+        }
+    } catch (err) {
+        console.warn('error at Trigger popupNotifyAction: ' + err.message);
+    }
+});
+
