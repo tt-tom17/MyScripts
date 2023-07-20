@@ -8,7 +8,7 @@
  *
  * Ansprüche gegenüber Dritten bestehen nicht.
  * 
- * Version 1.0.0
+ * Version 1.0.1
  * 
  * Das Script erstellt die Datenpunkte und Alias für den ChartLCard im Sonoff NSPanel
  * Es liest aus der History DB Werte eines Datenpunktes und erstellt daraus das Array für die Y-Skala und
