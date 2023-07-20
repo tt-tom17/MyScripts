@@ -9,7 +9,7 @@
  *
  * Ansprüche gegenüber Dritten bestehen nicht.
  * 
- * Version 1.0.0
+ * Version 1.0.1
  * 
  * Das Script erstellt die Datenpunkte und Alias für den ChartLCard im Sonoff NSPanel
  * Es liest aus der InFluxDB Werte eines Datenpunktes und erstellt daraus das Array für die Y-Skala und
@@ -48,7 +48,7 @@ const xAchseLabel: number = 240;  // Zeit in Minuten, nachdem x-Achse Wert bekom
 const InfluxInstance: string = 'influxdb.0';
 
 
-const Debug = true;
+const Debug = false;
 
 
 async function Init_Datenpunkte() {
