@@ -8,7 +8,7 @@
  *
  * Ansprüche gegenüber Dritten bestehen nicht.
  * 
- * Version 4.0.1
+ * Version 4.0.3
  * 
  * Das Script erstellt die Datenpunkte und Alias für den Abfallkalender im Sonoff NSPanel
  * Es wird der iCal Adapter benötigt und eine URL mit Terminen vom Entsorger bzw. eine .ics-Datei mit den Terminen.
@@ -35,14 +35,24 @@ const Debug: boolean = false;
 // Trigger auf iCal Instanz zur Json Tabelle
 on({ id: idAbfalliCal + '.data.table', change: 'ne' }, async function () {
 
+    JSON_auswerten();
+
+});
+
+// ------------------------------------- Ende Trigger ------------------------------------
+
+// ------------------------------------- Funktion JSON auswerten und DP füllen -------------------------------
+async function JSON_auswerten() {
     try {
 
         let muell_JSON: any;
         let eventName: string;
         let farbNummer: number = 0;
 
+        muell_JSON = getState(idAbfalliCal + '.data.table').val;
+        if (Debug) console.log('Rohdaten von iCal: ' + JSON.stringify(muell_JSON))
+
         for (let i = 1; i <= 4; i++) {
-            muell_JSON = getState(idAbfalliCal + '.data.table').val;
             setState(idUserdataAbfallVerzeichnis + '.' + String(i) + '.date', getAttr(muell_JSON, (String(i - 1) + '.date')));
             eventName = getAttr(muell_JSON, (String(i - 1) + '.event')).slice(idZeichenLoeschen, getAttr(muell_JSON, (String(i - 1) + '.event')).length);
             setState(idUserdataAbfallVerzeichnis + '.' + String(i) + '.event', eventName);
@@ -63,9 +73,9 @@ on({ id: idAbfalliCal + '.data.table', change: 'ne' }, async function () {
     } catch (err) {
         console.warn('error at subscrption: ' + err.message);
     }
-});
+};
 
-// ------------------------------------- Ende Trigger ------------------------------------
+// ------------------------------------- Ende Funktion JSON ------------------------------
 
 // ------------------------------------- Funktionen zur Prüfung und Erstellung der Datenpunkte in 0_userdata.0 und alias.0 -----------------------
 
@@ -87,6 +97,8 @@ async function Init_Datenpunkte() {
                 console.log('Datenpunkt ' + idUserdataAbfallVerzeichnis + '.' + String(i) + ' vorhanden')
             }
         }
+        console.log('Startabfrage der Daten aus dem iCal Adapter');
+        JSON_auswerten();
     } catch (err) {
         console.warn('error at function Init_Datenpunkte: ' + err.message);
     }
