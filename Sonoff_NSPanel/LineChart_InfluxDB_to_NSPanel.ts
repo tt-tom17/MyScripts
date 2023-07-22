@@ -9,13 +9,16 @@
  *
  * Ansprüche gegenüber Dritten bestehen nicht.
  * 
- * Version 1.0.1
+ * Version 1.0.2
  * 
  * Das Script erstellt die Datenpunkte und Alias für den ChartLCard im Sonoff NSPanel
  * Es liest aus der InFluxDB Werte eines Datenpunktes und erstellt daraus das Array für die Y-Skala und
  * den Daten-String für den Grafen und der X-SKala
  * 
  * Die Y-Skala errechnet sich aus min und max Werten der ausgelesen Werte der Datenbank
+ * 
+ * Bei Nutzung einer AliasID im in den Influx-Einstellungen zum Datenpunkt ist für das Measurement in der 
+ * Zusammenstellung des Querys die Konstante 'aliasInfluxDP' einzusetzen.
  * 
  * Beispiel für die Pagedefinition
  * let CardLChart = <PageChart>
@@ -39,6 +42,7 @@
 const userdataPfad: string = '0_userdata.0.Charts.AussenTemp' // Pfad unter =_userdata.0.
 const aliasPfad: string = 'alias.0.NSPanel.allgemein.Charts.AussenTemp'  // Pfad unter alias.0.
 const sourceDP: string = 'netatmo-crawler.0.stationData.1.temperature'/*stationData 1 temperature*/;
+const aliasInfluxDP: string = 'Wetter.Temperatur' // zu nutzen wenn im InfluxAdapter ein Alias vergeben wurde
 
 const zeitSpanne: number = 24;   // Zeitspanne in Stunden, die visualisiert werden
 const xAchseStrich: number = 60;   // Zeit in Minuten, nachdem die X-Achse einen Strich bekommt
@@ -78,9 +82,9 @@ let list: Array<string> = [];
 let scale: Array<number> = [];
 
     let query = [
-        'from(bucket: "iobroker")',
+        'from(bucket: "iobtest")',
         '|> range(start: -' + zeitSpanne + 'h)',
-        '|> filter(fn: (r) => r["_measurement"] == "' + sourceDP + '")',
+        '|> filter(fn: (r) => r["_measurement"] == "' + sourceDP + '")', // bei Nutzung der Alias-ID -> sourceDP durch aliasInfluxDP ersetzen
         '|> filter(fn: (r) => r["_field"] == "value")',
         '|> drop(columns: ["from", "ack", "q"])',
         '|> aggregateWindow(every: 1h, fn: last, createEmpty: false)',
