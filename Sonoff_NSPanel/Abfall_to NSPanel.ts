@@ -8,7 +8,7 @@
  *
  * Ansprüche gegenüber Dritten bestehen nicht.
  * 
- * Version 4.0.3
+ * Version 5.0.0
  * 
  * Das Script erstellt die Datenpunkte und Alias für den Abfallkalender im Sonoff NSPanel
  * Es wird der iCal Adapter benötigt und eine URL mit Terminen vom Entsorger bzw. eine .ics-Datei mit den Terminen.
@@ -22,7 +22,7 @@ const idUserdataAbfallVerzeichnis: string = '0_userdata.0.Abfallkalender'; // Na
 const idAliasPanelVerzeichnis: string = 'alias.0.NSPanel'; //Name PanelVerzeichnis unter alias.0. Standard = alias.0.NSPanel.1
 const idAliasAbfallVerzeichnis: string = 'Abfall'; //Name Verzeichnis unterhalb der idPanelverzeichnis  Standard = Abfall
 
-const idZeichenLoeschen: number = 0; // x Zeichen links vom String abziehen, wenn vor dem Eventname noch Text steht z.B. Strassenname; Standard = 0
+const idZeichenLoeschen: number = 14; // x Zeichen links vom String abziehen, wenn vor dem Eventname noch Text steht z.B. Strassenname; Standard = 0
 const idRestmuellName: string = 'Hausmüll'; // Schwarze Tonne
 const idWertstoffName: string = 'Gelber Sack'; // Gelbe Tonne / Sack
 const idPappePapierName: string = 'Papier';  // Blaue Tonne
@@ -47,28 +47,64 @@ async function JSON_auswerten() {
 
         let muell_JSON: any;
         let eventName: string;
+        let eventDatum: string;
+        let eventStartdatum: string;
         let farbNummer: number = 0;
+        let abfallNummer: number = 1;
 
         muell_JSON = getState(idAbfalliCal + '.data.table').val;
         if (Debug) console.log('Rohdaten von iCal: ' + JSON.stringify(muell_JSON))
 
-        for (let i = 1; i <= 4; i++) {
-            setState(idUserdataAbfallVerzeichnis + '.' + String(i) + '.date', getAttr(muell_JSON, (String(i - 1) + '.date')));
-            eventName = getAttr(muell_JSON, (String(i - 1) + '.event')).slice(idZeichenLoeschen, getAttr(muell_JSON, (String(i - 1) + '.event')).length);
-            setState(idUserdataAbfallVerzeichnis + '.' + String(i) + '.event', eventName);
 
-            if (Debug) console.log('%' + eventName + '%')
+        if (Debug) { console.log('Anzahl iCal - Daten: ' + muell_JSON.length) };
 
-            if (eventName == idRestmuellName) {
-                farbNummer = 33840;
-            } else if (eventName == idBioabfaelleName) {
-                farbNummer = 2016;
-            } else if (eventName == idPappePapierName) {
-                farbNummer = 31;
-            } else if (eventName == idWertstoffName) {
-                farbNummer = 65504;
+        for (let i = 0; i < muell_JSON.length; i++) {
+            if (abfallNummer === 5) {
+                if (Debug) console.log('Alle Abfall-Datenpunkte gefüllt');
+                break;
             }
-            setState(idUserdataAbfallVerzeichnis + '.' + String(i) + '.color', farbNummer);
+
+
+
+            eventName = getAttr(muell_JSON, (String(i) + '.event')).slice(idZeichenLoeschen, getAttr(muell_JSON, (String(i) + '.event')).length);
+            eventDatum = getAttr(muell_JSON, (String(i) + '.date'));
+            eventStartdatum = getAttr(muell_JSON, (String(i) + '._date'));
+            let d: Date = currentDate();
+            let d1: Date = new Date(eventStartdatum);
+
+            if (Debug) console.log('--------- Nächster Termin wird geprüft ---------');
+            //if (Debug) console.log(d + ' ' + d1);
+            if (Debug) console.log('Startdatum UTC: ' + eventStartdatum);
+            if (Debug) console.log('Datum: ' + eventDatum);
+            if (Debug) console.log('Event: ' + eventName);
+            if (Debug) console.log('Kontrolle Leerzeichen %' + eventName + '%');
+
+            if (d.getTime() <= d1.getTime()) {
+                if ((eventName == idRestmuellName) || (eventName == idWertstoffName) || (eventName == idBioabfaelleName) || (eventName == idPappePapierName)) {
+
+                    setState(idUserdataAbfallVerzeichnis + '.' + String(abfallNummer) + '.date', eventDatum);
+                    setState(idUserdataAbfallVerzeichnis + '.' + String(abfallNummer) + '.event', eventName);
+
+                    if (eventName == idRestmuellName) {
+                        farbNummer = 33840;
+                    } else if (eventName == idBioabfaelleName) {
+                        farbNummer = 2016;
+                    } else if (eventName == idPappePapierName) {
+                        farbNummer = 31;
+                    } else if (eventName == idWertstoffName) {
+                        farbNummer = 65504;
+                    }
+                    setState(idUserdataAbfallVerzeichnis + '.' + String(abfallNummer) + '.color', farbNummer);
+
+                    if (Debug) console.log('Abfallnummer: ' + abfallNummer);
+
+                    abfallNummer += 1
+                } else {
+                    if (Debug) console.log('Kein Abfalltermin => Event passt mit keinem Abfallnamen überein.');
+                }
+            }else{
+                if (Debug) console.log('Termin liegt vor dem heutigen Tag');
+            }
         }
     } catch (err) {
         console.warn('error at subscrption: ' + err.message);
@@ -76,6 +112,11 @@ async function JSON_auswerten() {
 };
 
 // ------------------------------------- Ende Funktion JSON ------------------------------
+
+function currentDate() {
+    let d: Date = new Date();
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+}
 
 // ------------------------------------- Funktionen zur Prüfung und Erstellung der Datenpunkte in 0_userdata.0 und alias.0 -----------------------
 
