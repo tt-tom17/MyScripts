@@ -8,7 +8,7 @@
  *
  * Ansprüche gegenüber Dritten bestehen nicht.
  * 
- * Version 5.0.0
+ * Version 5.0.1
  * 
  * Das Script erstellt die Datenpunkte und Alias für den Abfallkalender im Sonoff NSPanel
  * Es wird der iCal Adapter benötigt und eine URL mit Terminen vom Entsorger bzw. eine .ics-Datei mit den Terminen.
@@ -64,11 +64,14 @@ async function JSON_auswerten() {
                 break;
             }
 
-
-
             eventName = getAttr(muell_JSON, (String(i) + '.event')).slice(idZeichenLoeschen, getAttr(muell_JSON, (String(i) + '.event')).length);
+            // Leerzeichen vorne und hinten löschen
+            eventName = eventName.trimEnd();
+            eventName = eventName.trimStart();
+
             eventDatum = getAttr(muell_JSON, (String(i) + '.date'));
             eventStartdatum = getAttr(muell_JSON, (String(i) + '._date'));
+            
             let d: Date = currentDate();
             let d1: Date = new Date(eventStartdatum);
 
