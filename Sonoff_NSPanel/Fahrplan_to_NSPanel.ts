@@ -8,7 +8,9 @@
  *
  * Ansprüche gegenüber Dritten bestehen nicht.
  * 
- * Version 1.0.9
+ * Version 1.1.0
+ * 
+ * 12.10.23 - v1.1.0 - Breaking Change - Datenpunkte an das Panel Script angepasst -> vor dem Start des Scripts alten Ordner "Fahrplananzeiger" aus 0_userdata und Alias.0 löschen
  * 
  * auslesen der Daten aus dem Adapter Fahrplan und zusammenstellen für das Sonoff NSPanel
  * Die Farben für die Notifypage können unter https://nodtem66.github.io/nextion-hmi-color-convert/index.html
@@ -31,16 +33,16 @@ async function Init_Datenpunkte() {
             for (let i = 0; i < 6; i++) {
                 if (existsObject(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i)) == false) {
                     console.log('Datenpunkte werden angelegt')
-                    await createStateAsync(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.Abfahrzeit', '00:00', { type: 'string' });
-                    await createStateAsync(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.Richtung', 'Hbf', { type: 'string' });
-                    await createStateAsync(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.Fahrzeug', 'train', { type: 'string' });
-                    await createStateAsync(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.Verspätung', false, { type: 'boolean' });
+                    await createStateAsync(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.Departure', '00:00', { type: 'string', name: { de: 'Abfahrzeit', en: 'Departure time' } });
+                    await createStateAsync(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.Direction', 'Hbf', { type: 'string', name: { de: 'Richtung', en: 'Direction' } });
+                    await createStateAsync(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.Vehicle', 'train', { type: 'string', name: { de: 'Fahrzeug', en: 'Vehicle' } });
+                    await createStateAsync(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.Delay', false, { type: 'boolean', name: { de: 'Verspätung', en: 'Delay' } });
                     setObject(DP_Alias + 'FahrplanAnzeiger.Haltestelle' + String(h), { type: 'device', common: { role: 'timeTable', name: { de: 'Haltestelle ' + String(h), en: 'Station ' + String(h) } }, native: {} });
                     setObject(DP_Alias + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i), { type: 'channel', common: { role: 'timeTable', name: { de: 'Abfahrt ' + String(i), en: 'Departure ' + String(i) } }, native: {} });
-                    await createAliasAsync(DP_Alias + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.ACTUAL', DP_userdata + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.Abfahrzeit', true, <iobJS.StateCommon>{ type: 'string', role: 'state', name: { de: 'Abfahrzeit', en: 'Departure time' } });
-                    await createAliasAsync(DP_Alias + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.Richtung', DP_userdata + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.Richtung', true, <iobJS.StateCommon>{ type: 'string', role: 'state', name: { de: 'Richtung', en: 'Direction' } });
-                    await createAliasAsync(DP_Alias + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.Fahrzeug', DP_userdata + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.Fahrzeug', true, <iobJS.StateCommon>{ type: 'string', role: 'state', name: { de: 'Fahrzeug', en: 'Vehicle' } });
-                    await createAliasAsync(DP_Alias + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.Verspätung', DP_userdata + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.Verspätung', true, <iobJS.StateCommon>{ type: 'boolean', role: 'state', name: { de: 'Verspätung', en: 'Delay' } });
+                    await createAliasAsync(DP_Alias + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.ACTUAL', DP_userdata + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.Departure', true, <iobJS.StateCommon>{ type: 'string', role: 'state', name: { de: 'Abfahrzeit', en: 'Departure time' } });
+                    await createAliasAsync(DP_Alias + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.DIRECTION', DP_userdata + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.Direction', true, <iobJS.StateCommon>{ type: 'string', role: 'state', name: { de: 'Richtung', en: 'Direction' } });
+                    await createAliasAsync(DP_Alias + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.VEHICLE', DP_userdata + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.Vehicle', true, <iobJS.StateCommon>{ type: 'string', role: 'state', name: { de: 'Fahrzeug', en: 'Vehicle' } });
+                    await createAliasAsync(DP_Alias + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.DELAY', DP_userdata + 'FahrplanAnzeiger.Haltestelle' + String(h) + '.Abfahrt' + String(i) + '.Delay', true, <iobJS.StateCommon>{ type: 'boolean', role: 'state', name: { de: 'Verspätung', en: 'Delay' } });
                     console.log('Fertig')
                 } else {
                     console.log('Datenpunkte vorhanden')
@@ -116,16 +118,16 @@ async function JSON_Umwandeln(JSON_Plan: string, Haltestelle: string) {
                 let geplanteUhrzeit: string = formatDate(GeplanteAbfahrzeit, 'hh:mm');
 
                 if (Timedelay > 0 && Timedelay != null) {
-                    setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Abfahrzeit', Uhrzeit, true);
-                    setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Verspätung', true, true);
+                    setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Departure', Uhrzeit, true);
+                    setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Delay', true, true);
                     Minuten = Math.round(Timedelay / 60)
                 } else {
-                    setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Abfahrzeit', geplanteUhrzeit, true);
-                    setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Verspätung', false, true);
+                    setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Departure', geplanteUhrzeit, true);
+                    setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Delay', false, true);
                 }
 
-                setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Fahrzeug', Fahrzeug, true);
-                setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Richtung', Richtung, true);
+                setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Vehicle', Fahrzeug, true);
+                setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (h) + '.Abfahrt' + String(i) + '.Direction', Richtung, true);
 
                 let Notifytext: string = ['Der ' + Fahrzeugnummer + ' nach', '\r\n', Richtung, '\r\n', 'planmäßige Abfahrtzeit ' + geplanteUhrzeit, '\r\n', 'fährt aktuell um ' + Uhrzeit + ' ab.', '\r\n', 'Aktuelle Verspätung beträgt ' + Minuten + ' Minuten.'].join('');
 
@@ -173,10 +175,10 @@ async function JSON_Umwandeln(JSON_Plan: string, Haltestelle: string) {
 
 function Reset_Data(Haltestelle: string) {
     for (let i = 0; i < 6; i++) {
-        setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (Haltestelle) + '.Abfahrt' + String(i) + '.Abfahrzeit', '', true);
-        setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (Haltestelle) + '.Abfahrt' + String(i) + '.Verspätung', false, true);
-        setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (Haltestelle) + '.Abfahrt' + String(i) + '.Fahrzeug', '', true);
-        setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (Haltestelle) + '.Abfahrt' + String(i) + '.Richtung', '', true);
+        setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (Haltestelle) + '.Abfahrt' + String(i) + '.Departure', '', true);
+        setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (Haltestelle) + '.Abfahrt' + String(i) + '.Delay', false, true);
+        setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (Haltestelle) + '.Abfahrt' + String(i) + '.Vehicle', '', true);
+        setState(DP_userdata + 'FahrplanAnzeiger.Haltestelle' + (Haltestelle) + '.Abfahrt' + String(i) + '.Direction', '', true);
     };
 };
 
