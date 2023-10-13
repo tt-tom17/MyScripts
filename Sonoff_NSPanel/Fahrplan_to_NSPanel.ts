@@ -8,9 +8,10 @@
  *
  * Ansprüche gegenüber Dritten bestehen nicht.
  * 
- * Version 1.1.0
+ * Version 1.1.1
  * 
  * 12.10.23 - v1.1.0 - Breaking Change - Datenpunkte an das Panel Script angepasst -> vor dem Start des Scripts alten Ordner "Fahrplananzeiger" aus 0_userdata und Alias.0 löschen
+ * 13.10.23 - v1.1.1 - Fix zusätzliche Infos
  * 
  * auslesen der Daten aus dem Adapter Fahrplan und zusammenstellen für das Sonoff NSPanel
  * Die Farben für die Notifypage können unter https://nodtem66.github.io/nextion-hmi-color-convert/index.html
@@ -74,7 +75,7 @@ async function JSON_Umwandeln(JSON_Plan: string, Haltestelle: string) {
         } else {
 
 
-            if (Debug) console.log(getState(JSON_Plan).val);
+//            if (Debug) console.log(getState(JSON_Plan).val);
 
             Reset_Data(h)
 
@@ -99,19 +100,13 @@ async function JSON_Umwandeln(JSON_Plan: string, Haltestelle: string) {
                 Fahrzeugnummer = getAttr(Abfahrt, 'line.name');
 
                 let Bemerkungen = getAttr(Abfahrt, 'remarks');
-                    Info = '';
+                Info = '';
 
                 for (let t = 0; t < Bemerkungen.length; t++) {
                     if (getAttr(Bemerkungen[t], 'type') == 'status') {
                         Info += getAttr(Bemerkungen[t], 'text');
                         Info += ' ';
                     };
-                };
-                if (Info != '') {
-                    console.log(Info);
-                    setState(DP_NSPanel + 'popupNotify.popupNotifyInternalName', 'DelayFahrplanScript', true);
-                   // setState(DP_NSPanel + 'popupNotify.popupNotifyText', [Info.substring(0, 44), Info.substring(45, 90)].join('\n'), true);
-                    setState(DP_NSPanel + 'popupNotify.popupNotifyText', Info, true);
                 };
 
                 let Uhrzeit: string = formatDate(AktuelleAbfahrzeit, 'hh:mm');
@@ -133,6 +128,7 @@ async function JSON_Umwandeln(JSON_Plan: string, Haltestelle: string) {
 
                 //Bei Verspätung Daten für PopupNotifypage erzeugen und auslösen
                 if (Timedelay > Verspaetungszeit && VerspaetungPopup) {
+
                     setState(DP_NSPanel + 'popupNotify.popupNotifySleepTimeout', 600, true);            // number in sekunden 0 = aus
                     setState(DP_NSPanel + 'popupNotify.popupNotifyLayout', 1, true);                        // number 1 oder 2
                     setState(DP_NSPanel + 'popupNotify.popupNotifyInternalName', 'DelayFahrplanScript', true);        // string löst den Trigger aus, geschützte Werte sind TasmotaFirmwareUpdate, BerryDriverUpdate, TFTFirmwareUpdate und Wörter die Update enthalten 
@@ -155,15 +151,12 @@ async function JSON_Umwandeln(JSON_Plan: string, Haltestelle: string) {
                     console.log('popupNotifypage ausgelöst Haltestelle ' + (h) + ' Abfahrt ' + String(i) + ' Richtung ' + Richtung);
                 }
 
-
-
-
-
-
-                if (Debug) console.log('Abfahrt: ' + i);
+                if (Debug) console.log('Beginn Auswertung Abfahrt: ' + i);
                 if (Debug) console.log('Abfahrzeit geplant: ' + GeplanteAbfahrzeit + ' Richtung: ' + Richtung + ' Fahrzeug: ' + Fahrzeug + ' Verspätung in sec: ' + Timedelay + ' aktuelle Abfahrzeit: ' + AktuelleAbfahrzeit);
                 if (Debug) console.log('Uhrzeit geplant: ' + geplanteUhrzeit + ' aktuelle Uhrzeit: ' + Uhrzeit);
-                if (Debug) console.log('Popup: ' + VerspaetungPopup + ' Minuten: ' + Minuten)
+                if (Debug) console.log('Popup öffnen: ' + VerspaetungPopup + ', Verspätung in Minuten: ' + Minuten);
+                if (Debug) console.log('Zusatzinfomationen: ' + Info);
+                if (Debug) console.log('Ende Auswertung Daten');
 
             };
         };
@@ -208,7 +201,9 @@ on({ id: DP_NSPanel + 'popupNotify.popupNotifyAction', change: 'any' }, async fu
                     setTimeout(function () {
                         setState(DP_NSPanel + 'popupNotify.popupNotifySleepTimeout', 60, true);
                         setState(DP_NSPanel + 'popupNotify.popupNotifyInternalName', 'DelayFahrplanScript', true);
-                        setState(DP_NSPanel + 'popupNotify.popupNotifyText', Info.substring(91, Info.length), true);
+//                        setState(DP_NSPanel + 'popupNotify.popupNotifyText', [Info.substring(0, 44), Info.substring(45, 90)].join('\n'), true);                        
+//                        setState(DP_NSPanel + 'popupNotify.popupNotifyText', Info.substring(91, Info.length), true);
+                        setState(DP_NSPanel + 'popupNotify.popupNotifyText', Info, true);                        
                         setState(DP_NSPanel + 'popupNotify.popupNotifyButton2Text', '', true);
                     }, 1000);
 
@@ -220,4 +215,3 @@ on({ id: DP_NSPanel + 'popupNotify.popupNotifyAction', change: 'any' }, async fu
         console.warn('error at Trigger popupNotifyAction: ' + err.message);
     }
 });
-
