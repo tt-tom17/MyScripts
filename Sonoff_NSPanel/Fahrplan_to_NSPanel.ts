@@ -9,6 +9,8 @@
  * Ansprüche gegenüber Dritten bestehen nicht.
  * 
  * Version 1.1.1
+ *
+ * Setzt NSPanel Script Version 4.3.1.5 oder größer voraus
  * 
  * 12.10.23 - v1.1.0 - Breaking Change - Datenpunkte an das Panel Script angepasst -> vor dem Start des Scripts alten Ordner "Fahrplananzeiger" aus 0_userdata und Alias.0 löschen
  * 13.10.23 - v1.1.1 - Fix zusätzliche Infos
