@@ -4,11 +4,6 @@
  *
  * Dieses Skript dient zur freien Verwendung in ioBroker zur Überprüfung der Internetgeschwindkeit mit Hilfe von Speedtest.
  * im ioBrocker Forum gibt es hier den pasenden Beitrag https://forum.iobroker.net/topic/48700
- * Jegliche Verantwortung liegt beim Benutzer. Das Skript wurde unter Berücksichtigung der bestmöglichen Nutzung
- * und Performance entwickelt.
- * Der Entwickler versichert, das keine böswilligen Systemeingriffe im originalen Skript vorhanden sind.
- * 
- * Ansprüche gegenüber Dritten bestehen nicht. 
  * 
  * Der Ursprung zu diesem Script stammt von Stephan Kreyenborg 
  * Skript Version:    1.3
