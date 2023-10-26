@@ -1,12 +1,5 @@
 /*
  * @author 2023 @tt-tom
- *
- * Dieses Skript dient zur freien Verwendung in ioBroker.
- * Jegliche Verantwortung liegt beim Benutzer. Das Skript wurde unter Berücksichtigung der bestmöglichen Nutzung
- * und Performance entwickelt.
- * Der Entwickler versichert, das keine böswilligen Systemeingriffe im originalen Skript vorhanden sind.
- *
- * Ansprüche gegenüber Dritten bestehen nicht.
  * 
  * Version 1.1.1
  *
