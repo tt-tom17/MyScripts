@@ -12,10 +12,10 @@
 
 const idAbfalliCal: string = 'ical.0'; // iCal Instanz zum Abfallkalender
 const idUserdataAbfallVerzeichnis: string = '0_userdata.0.Abfallkalender'; // Name des Datenpunktverzeichnis unter 0_userdata.0 -> Strandard = 0_userdata.0.Abfallkalender
-const idAliasPanelVerzeichnis: string = 'alias.0.NSPanel'; //Name PanelVerzeichnis unter alias.0. Standard = alias.0.NSPanel.1
+const idAliasPanelVerzeichnis: string = 'alias.0.NSPanel.1'; //Name PanelVerzeichnis unter alias.0. Standard = alias.0.NSPanel.1
 const idAliasAbfallVerzeichnis: string = 'Abfall'; //Name Verzeichnis unterhalb der idPanelverzeichnis  Standard = Abfall
 
-const idZeichenLoeschen: number = 14; // x Zeichen links vom String abziehen, wenn vor dem Eventname noch Text steht z.B. Strassenname; Standard = 0
+const idZeichenLoeschen: number = 0; // x Zeichen links vom String abziehen, wenn vor dem Eventname noch Text steht z.B. Strassenname; Standard = 0
 const idRestmuellName: string = 'Hausmüll'; // Schwarze Tonne
 const idWertstoffName: string = 'Gelber Sack'; // Gelbe Tonne / Sack
 const idPappePapierName: string = 'Papier';  // Blaue Tonne
