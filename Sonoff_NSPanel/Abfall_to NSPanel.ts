@@ -1,35 +1,44 @@
 /*
  * @author 2023 @tt-tom
  * 
- * Version 5.0.1
+ * Version 5.1.0
  * 
  * Das Script erstellt die Datenpunkte und Alias für den Abfallkalender im Sonoff NSPanel
  * Es wird der iCal Adapter benötigt und eine URL mit Terminen vom Entsorger bzw. eine .ics-Datei mit den Terminen.
  * Das Script triggert auf dem bereitgestellten JSON im iCal adapter und füllt die 0_userdata.0 Datenpunkte
  * Weitere Informationen findest du in der FAQ auf Github https://github.com/joBr99/nspanel-lovelace-ui/wiki
+ * 
+ * changelog
+ *  - 06.12.2023 - v5.0.2 add custom name for trashtype
+ *  - 06.12.2023 - v5.1.0 Refactoring
+ * 
+ * 
 */
 
 
-const idAbfalliCal: string = 'ical.0'; // iCal Instanz zum Abfallkalender
+const idTrashData: string = 'ical.0.data.table'; // Datenpunkt mit Daten im JSON Format
 const idUserdataAbfallVerzeichnis: string = '0_userdata.0.Abfallkalender'; // Name des Datenpunktverzeichnis unter 0_userdata.0 -> Strandard = 0_userdata.0.Abfallkalender
-const idAliasPanelVerzeichnis: string = 'alias.0.NSPanel.1'; //Name PanelVerzeichnis unter alias.0. Standard = alias.0.NSPanel.1
+const idAliasPanelVerzeichnis: string = 'alias.0.NSPanel.allgemein'; //Name PanelVerzeichnis unter alias.0. Standard = alias.0.NSPanel.1
 const idAliasAbfallVerzeichnis: string = 'Abfall'; //Name Verzeichnis unterhalb der idPanelverzeichnis  Standard = Abfall
 
-const idZeichenLoeschen: number = 0; // x Zeichen links vom String abziehen, wenn vor dem Eventname noch Text steht z.B. Strassenname; Standard = 0
-const idRestmuellName: string = 'Hausmüll'; // Schwarze Tonne
-const idWertstoffName: string = 'Gelber Sack'; // Gelbe Tonne / Sack
-const idPappePapierName: string = 'Papier';  // Blaue Tonne
-const idBioabfaelleName: string = 'Biomüll'; // Braune Tonne
+const anzahlZeichenLoeschen: number = 0; // x Zeichen links vom String abziehen, wenn vor dem Eventname noch Text steht z.B. Strassenname; Standard = 0
+const jsonEventName1: string = 'Gelbe Tonne, Biotonne, Restmülltonne'; // Vergleichstring für Schwarze Tonne
+const customEventName1: string = 'Ohne Papiertonne';        // benutzerdefinierter Text für schwarze Tonne
+const jsonEventName2: string = 'Gelbe Sack'; // Vergleichstring für Gelbe Tonne / Sack
+const customEventName2: string = '';        // benutzerdefinierter Text für gelbe Tonne
+const jsonEventName3: string = 'Gelbe Tonne, Biotonne, Restmülltonne, Blaue Papiertonne, Restmülltonne 4-wöchentlich';    // Vergleichstring für Blaue Tonne
+const customEventName3: string = 'Mit Papiertonne';       // benutzerdefinierter Text für blaue Tonne
+const jsonEventName4: string = 'Biomüll';   // Vergleichstring für Braune Tonne
+const customEventName4: string = '';        // benutzerdefinierter Text für braune Tonne
 
-const Debug: boolean = false;
+
+const Debug: boolean = true;
 
 // ------------------------- Trigger zum füllen der 0_userdata Datenpunkte aus dem json vom ical Adapter -------------------------------
 
-// Trigger auf iCal Instanz zur Json Tabelle
-on({ id: idAbfalliCal + '.data.table', change: 'ne' }, async function () {
-
+// Trigger auf JSON Datenpunkt
+on({ id: idTrashData, change: 'ne' }, async function () {
     JSON_auswerten();
-
 });
 
 // ------------------------------------- Ende Trigger ------------------------------------
@@ -38,89 +47,113 @@ on({ id: idAbfalliCal + '.data.table', change: 'ne' }, async function () {
 async function JSON_auswerten() {
     try {
 
-        let muell_JSON: any;
+        let trashJSON: any;
+        let instanzName: any;
         let eventName: string;
         let eventDatum: string;
         let eventStartdatum: string;
         let farbNummer: number = 0;
+        let farbString: string;
         let abfallNummer: number = 1;
 
-        muell_JSON = getState(idAbfalliCal + '.data.table').val;
-        if (Debug) console.log('Rohdaten von iCal: ' + JSON.stringify(muell_JSON))
+        trashJSON = getState(idTrashData).val;
+        instanzName = idTrashData.split('.');
+
+        if (Debug) log('Rohdaten von Instanz ' + instanzName[0] + ': ' + JSON.stringify(trashJSON), 'info')
 
 
-        if (Debug) { console.log('Anzahl iCal - Daten: ' + muell_JSON.length) };
+        if (Debug) log('Anzahl Trash - Daten: ' + trashJSON.length, 'info');
 
-        for (let i = 0; i < muell_JSON.length; i++) {
+        for (let i = 0; i < trashJSON.length; i++) {
             if (abfallNummer === 5) {
-                if (Debug) console.log('Alle Abfall-Datenpunkte gefüllt');
+                if (Debug) log('Alle Abfall-Datenpunkte gefüllt', 'warn');
                 break;
             }
 
-            eventName = getAttr(muell_JSON, (String(i) + '.event')).slice(idZeichenLoeschen, getAttr(muell_JSON, (String(i) + '.event')).length);
+            log('Daten vom ical Adapter werden ausgewertet', 'info');
+            eventName = getAttr(trashJSON, (String(i) + '.event')).slice(anzahlZeichenLoeschen, getAttr(trashJSON, (String(i) + '.event')).length);
             // Leerzeichen vorne und hinten löschen
             eventName = eventName.trimEnd();
             eventName = eventName.trimStart();
+            eventDatum = getAttr(trashJSON, (String(i) + '.date'));
+            eventStartdatum = getAttr(trashJSON, (String(i) + '._date'));
 
-            eventDatum = getAttr(muell_JSON, (String(i) + '.date'));
-            eventStartdatum = getAttr(muell_JSON, (String(i) + '._date'));
-            
             let d: Date = currentDate();
             let d1: Date = new Date(eventStartdatum);
 
-            if (Debug) console.log('--------- Nächster Termin wird geprüft ---------');
-            //if (Debug) console.log(d + ' ' + d1);
-            if (Debug) console.log('Startdatum UTC: ' + eventStartdatum);
-            if (Debug) console.log('Datum: ' + eventDatum);
-            if (Debug) console.log('Event: ' + eventName);
-            if (Debug) console.log('Kontrolle Leerzeichen %' + eventName + '%');
+            if (Debug) log('--------- Nächster Termin wird geprüft ---------', 'info');
+            //if (Debug)  log(d + ' ' + d1, 'info');
+            if (Debug) log('Startdatum UTC: ' + eventStartdatum, 'info');
+            if (Debug) log('Datum: ' + eventDatum, 'info');
+            if (Debug) log('Event: ' + eventName, 'info');
+            if (Debug) log('Kontrolle Leerzeichen %' + eventName + '%', 'info');
 
             if (d.getTime() <= d1.getTime()) {
-                if ((eventName == idRestmuellName) || (eventName == idWertstoffName) || (eventName == idBioabfaelleName) || (eventName == idPappePapierName)) {
+                if ((eventName == jsonEventName1) || (eventName == jsonEventName2) || (eventName == jsonEventName4) || (eventName == jsonEventName3)) {
+
+                    switch (eventName) {
+                        case jsonEventName1:
+                            farbNummer = 33840;
+                            if (customEventName1 != '') {
+                                eventName = customEventName1;
+                                if (Debug) log('Event customName: ' + eventName, 'info');
+                            };
+                            break;
+                        case jsonEventName2:
+                            farbNummer = 65504;
+                            if (customEventName1 != '') {
+                                eventName = customEventName2;
+                                if (Debug) log('Event customName: ' + eventName, 'info');
+                            };
+                            break;
+                        case jsonEventName3:
+                            farbNummer = 31;
+                            if (customEventName1 != '') {
+                                eventName = customEventName3
+                                if (Debug) log('Event customName: ' + eventName, 'info');
+                            };
+                            break;
+                        case jsonEventName4:
+                            farbNummer = 2016;
+                            if (customEventName1 != '') {
+                                eventName = customEventName4;
+                                if (Debug) log('Event customName: ' + eventName, 'info');
+                            };
+                            break;
+                    }
+                    if (farbString != undefined) farbNummer = rgb_dec565(hex_rgb(farbString));
+
 
                     setState(idUserdataAbfallVerzeichnis + '.' + String(abfallNummer) + '.date', eventDatum);
                     setState(idUserdataAbfallVerzeichnis + '.' + String(abfallNummer) + '.event', eventName);
-
-                    if (eventName == idRestmuellName) {
-                        farbNummer = 33840;
-                    } else if (eventName == idBioabfaelleName) {
-                        farbNummer = 2016;
-                    } else if (eventName == idPappePapierName) {
-                        farbNummer = 31;
-                    } else if (eventName == idWertstoffName) {
-                        farbNummer = 65504;
-                    }
                     setState(idUserdataAbfallVerzeichnis + '.' + String(abfallNummer) + '.color', farbNummer);
 
-                    if (Debug) console.log('Abfallnummer: ' + abfallNummer);
+
+                    if (Debug) log('farbString: ' + farbString + ' farbNummer: ' + farbNummer, 'info');
+                    if (Debug) log('Abfallnummer: ' + abfallNummer, 'info');
 
                     abfallNummer += 1
                 } else {
-                    if (Debug) console.log('Kein Abfalltermin => Event passt mit keinem Abfallnamen überein.');
+                    if (Debug) log('Kein Abfalltermin => Event passt mit keinem Abfallnamen überein.', 'warn');
                 }
-            }else{
-                if (Debug) console.log('Termin liegt vor dem heutigen Tag');
+            } else {
+                if (Debug) log('Termin liegt vor dem heutigen Tag', 'warn');
             }
         }
     } catch (err) {
-        console.warn('error at subscrption: ' + err.message);
+        log('error at subscrption: ' + err.message, 'warn');
     }
 };
 
 // ------------------------------------- Ende Funktion JSON ------------------------------
 
-function currentDate() {
-    let d: Date = new Date();
-    return new Date(d.getFullYear(), d.getMonth(), d.getDate());
-}
-
-// ------------------------------------- Funktionen zur Prüfung und Erstellung der Datenpunkte in 0_userdata.0 und alias.0 -----------------------
+// ------------------------------------- Funktion zur Prüfung und Erstellung der Datenpunkte in 0_userdata.0 und alias.0 -----------------------
 
 async function Init_Datenpunkte() {
     try {
         for (let i = 1; i <= 4; i++) {
             if (existsObject(idUserdataAbfallVerzeichnis + '.' + String(i)) == false) {
-                console.log('Datenpunkt ' + idUserdataAbfallVerzeichnis + '.' + String(i) + ' werden angelegt')
+                log('Datenpunkt ' + idUserdataAbfallVerzeichnis + '.' + String(i) + ' werden angelegt', 'info')
                 await createStateAsync(idUserdataAbfallVerzeichnis + '.' + String(i) + '.date', '', { type: 'string' });
                 await createStateAsync(idUserdataAbfallVerzeichnis + '.' + String(i) + '.event', '', { type: 'string' });
                 await createStateAsync(idUserdataAbfallVerzeichnis + '.' + String(i) + '.color', 0, { type: 'number' });
@@ -129,17 +162,44 @@ async function Init_Datenpunkte() {
                 await createAliasAsync(idAliasPanelVerzeichnis + '.' + idAliasAbfallVerzeichnis + '.event' + String(i) + '.TITLE', idUserdataAbfallVerzeichnis + '.' + String(i) + '.event', true, <iobJS.StateCommon>{ type: 'string', role: 'weather.title.short', name: { de: 'TITEL', en: 'TITLE' } });
                 await createAliasAsync(idAliasPanelVerzeichnis + '.' + idAliasAbfallVerzeichnis + '.event' + String(i) + '.LEVEL', idUserdataAbfallVerzeichnis + '.' + String(i) + '.color', true, <iobJS.StateCommon>{ type: 'number', role: 'value.warning', name: { de: 'LEVEL', en: 'LEVEL' } });
                 await createAliasAsync(idAliasPanelVerzeichnis + '.' + idAliasAbfallVerzeichnis + '.event' + String(i) + '.INFO', idUserdataAbfallVerzeichnis + '.' + String(i) + '.date', true, <iobJS.StateCommon>{ type: 'string', role: 'weather.title', name: { de: 'INFO', en: 'INFO' } });
-                console.log('Fertig')
+                log('Fertig', 'info')
             } else {
-                console.log('Datenpunkt ' + idUserdataAbfallVerzeichnis + '.' + String(i) + ' vorhanden')
+                log('Datenpunkt ' + idUserdataAbfallVerzeichnis + '.' + String(i) + ' vorhanden', 'info')
             }
         }
-        console.log('Startabfrage der Daten aus dem iCal Adapter');
+        log('Startabfrage der Daten', 'info');
         JSON_auswerten();
     } catch (err) {
-        console.warn('error at function Init_Datenpunkte: ' + err.message);
+        log('error at function Init_Datenpunkte: ' + err.message, 'warn');
     }
 }
 Init_Datenpunkte();
 
-// --------------------------- Ende Funktionen Datenpunkte ------------------------------------------------
+// --------------------------- Ende Funktion Datenpunkte ------------------------------------------------
+
+
+// --------------------------- Zusatzfuktionen -------------------------------------------------------------
+function currentDate() {
+    let d: Date = new Date();
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+}
+
+function rgb_dec565(rgb: RGB): number {
+    //return ((Math.floor(rgb.red / 255 * 31) << 11) | (Math.floor(rgb.green / 255 * 63) << 5) | (Math.floor(rgb.blue / 255 * 31)));
+    return ((rgb.red >> 3) << 11) | ((rgb.green >> 2)) << 5 | ((rgb.blue) >> 3);
+}
+
+function hex_rgb(colorhex: string): RGB {
+    let r = parseInt(colorhex.substring(1, 3), 16);
+    let g = parseInt(colorhex.substring(3, 5), 16);
+    let b = parseInt(colorhex.substring(5, 7), 16);
+    return { red: r, green: g, blue: b };
+}
+
+type RGB = {
+    red: number,
+    green: number,
+    blue: number
+};
+
+// -------------------- Ende Zudatzfunktionen --------------------------------------------------------------------------
