@@ -22,6 +22,13 @@ let Info: string = '';
 
 const Debug = false;
 
+
+// Map für icon => [line.name vom Fahrplan, Iconname aus der Icon-Datei (NSPanel)]
+const FahrzeugMap = new Map([
+    ['bus', 'bus'],
+    ['train', 'train']
+]);
+
 // erstellen der Datenpunkte in 0_userdata.0 und alias.0 je Haltestelle
 async function Init_Datenpunkte() {
     try {
