@@ -103,7 +103,7 @@ async function JSON_Umwandeln(JSON_Plan: string, Haltestelle: string) {
                 Fahrzeug = FahrzeugMap.get(Fahrzeug);
                 } else {
                     log('Fahrzeug: ' + Fahrzeug + ' in FahrzeugMap nicht vorhanden! Standardicon genutzt.', 'warn');
-                Fahrzeug = 'information_outline'
+                Fahrzeug = 'information-outline'
                 }
                 Timedelay = getAttr(Abfahrt, 'delay');
                 Fahrzeugnummer = getAttr(Abfahrt, 'line.name');
