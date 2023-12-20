@@ -1,12 +1,13 @@
 /*
  * @author 2023 @tt-tom
  * 
- * Version 1.1.1
+ * Version 1.1.2
  *
  * Setzt NSPanel Script Version 4.3.1.5 oder größer voraus
  * 
  * 12.10.23 - v1.1.0 - Breaking Change - Datenpunkte an das Panel Script angepasst -> vor dem Start des Scripts alten Ordner "Fahrplananzeiger" aus 0_userdata und Alias.0 löschen
  * 13.10.23 - v1.1.1 - Fix zusätzliche Infos
+ * 20.12.23 - v1.1.2 - Add mapping line.name => Iconname
  * 
  * auslesen der Daten aus dem Adapter Fahrplan und zusammenstellen für das Sonoff NSPanel
  * Die Farben für die Notifypage können unter https://nodtem66.github.io/nextion-hmi-color-convert/index.html
@@ -98,6 +99,12 @@ async function JSON_Umwandeln(JSON_Plan: string, Haltestelle: string) {
                 GeplanteAbfahrzeit = getAttr(Abfahrt, 'plannedWhen')
                 Richtung = getAttr(Abfahrt, 'direction');
                 Fahrzeug = getAttr(Abfahrt, 'line.mode');
+                if (FahrzeugMap.has(Fahrzeug)){
+                Fahrzeug = FahrzeugMap.get(Fahrzeug);
+                } else {
+                    log('Fahrzeug: ' + Fahrzeug + ' in FahrzeugMap nicht vorhanden! Standardicon genutzt.', 'warn');
+                Fahrzeug = 'info_outlet'
+                }
                 Timedelay = getAttr(Abfahrt, 'delay');
                 Fahrzeugnummer = getAttr(Abfahrt, 'line.name');
 
