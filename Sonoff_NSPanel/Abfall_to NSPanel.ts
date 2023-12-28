@@ -89,7 +89,7 @@ async function JSON_auswerten() {
             if (Debug) log('Kontrolle Leerzeichen %' + eventName + '%', 'info');
 
             if (d.getTime() <= d1.getTime()) {
-                if ((eventName == jsonEventName1) || (eventName == jsonEventName2) || (eventName == jsonEventName4) || (eventName == jsonEventName3)) {
+                if ((eventName == jsonEventName1) || (eventName == jsonEventName2) || (eventName == jsonEventName3) || (eventName == jsonEventName4)) {
 
                     switch (eventName) {
                         case jsonEventName1:
@@ -101,21 +101,21 @@ async function JSON_auswerten() {
                             break;
                         case jsonEventName2:
                             farbNummer = 65504;
-                            if (customEventName1 != '') {
+                            if (customEventName2 != '') {
                                 eventName = customEventName2;
                                 if (Debug) log('Event customName: ' + eventName, 'info');
                             };
                             break;
                         case jsonEventName3:
                             farbNummer = 31;
-                            if (customEventName1 != '') {
+                            if (customEventName3 != '') {
                                 eventName = customEventName3
                                 if (Debug) log('Event customName: ' + eventName, 'info');
                             };
                             break;
                         case jsonEventName4:
                             farbNummer = 2016;
-                            if (customEventName1 != '') {
+                            if (customEventName4 != '') {
                                 eventName = customEventName4;
                                 if (Debug) log('Event customName: ' + eventName, 'info');
                             };
