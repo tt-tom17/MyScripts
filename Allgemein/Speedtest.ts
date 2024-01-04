@@ -9,6 +9,7 @@
  * Skript Version:    1.3
  * Erstell-Datum:    29. November 2021
  * 
+ * 
  */
 
 // Datenpunkt in 0_userdata.0. der Stammdatenordner des Script ist "Speedtest"
