@@ -10,17 +10,17 @@
  * Die Y-Skala errechnet sich aus min und max Werten der ausgelesen Werte der Datenbank
  * 
  * Beispiel für die Pagedefinition
- * let CardLChart = <PageChart>
+ * let CardLChart.PageType =
     {
     "type": "cardLChart",
     "heading": "Außentemperatur",
     "useColor": true,
-    'items': [<PageItem>{ 
+    'items': [/*PageItem*/{ 
                 id: 'alias.0.NSPanel.allgemein.Charts.AussenTemp',
                 yAxis: 'Temperatur [°C]',
                 yAxisTicks: 'alias.0.NSPanel.allgemein.Charts.AussenTemp.SCALE',
                 onColor: Yellow
-             }]
+             }];
     };
  *
  *
@@ -43,19 +43,19 @@ const limitMeasurements = 35;
 async function Init_Datenpunkte() {
     try {
         if (existsObject(userdataPfad) == false) {
-            console.log('Datenpunkte werden angelegt')
+            log('Datenpunkte werden angelegt')
             let deviceName: Array<string> = userdataPfad.split('.')
             await createStateAsync(userdataPfad + '.Werte', '', { name: 'SensorWerte', desc: 'Sensor Werte [~<time>:<value>]*', type: 'string', role: 'value'});
             await createStateAsync(userdataPfad + '.Scale', '', { name: 'YScaleGrid', desc: 'Skala Y Achse', type: 'string', role: 'value'});
             setObject(aliasPfad, { type: 'channel', common: { role: 'info', name: { de: deviceName[deviceName.length], en: deviceName[deviceName.length] } }, native: {} });
             await createAliasAsync(aliasPfad + '.ACTUAL', userdataPfad + '.Werte', true, <iobJS.StateCommon>{ type: 'string', role: 'value', name: { de: 'Sensor Werte', en: 'Sensor Values' } });
             await createAliasAsync(aliasPfad + '.SCALE', userdataPfad + '.Scale', true, <iobJS.StateCommon>{ type: 'string', role: 'value', name: { de: 'Skala Y Achse', en: 'Scale Y Axis' } });
-            console.log('Fertig')
+            log('Fertig')
         } else {
-            console.log('Datenpunkte vorhanden')
+            log('Datenpunkte vorhanden')
         };
     } catch (err) {
-        console.warn('error at function Init_Datenpunkte: ' + err.message);
+        log('error at function Init_Datenpunkte: ' + err.message, 'warn');
     };
 };
 Init_Datenpunkte();
@@ -72,6 +72,9 @@ on({ id: sourceDP, change: "any" }, async function (obj) {
             aggregate: 'average'
         }
     }, function (result) {
+        if (result.error){
+            log('Abfragefehler: ' + result.error, 'error');
+        }else{
         let ticksAndLabels: string = '';
         let coordinates: string = '';
         let cardLChartValue: string = '';
@@ -125,8 +128,8 @@ on({ id: sourceDP, change: "any" }, async function (obj) {
         max = Math.max(...scale);
         min = Math.min(...scale);
 
-        if (Debug) console.log(min);
-        if (Debug) console.log(max);
+        if (Debug) log(min);
+        if (Debug) log(max);
 
         intervall = max - min;
         intervall = Math.round(intervall / 4);
@@ -143,8 +146,8 @@ on({ id: sourceDP, change: "any" }, async function (obj) {
         setState(userdataPfad + '.Werte', cardLChartValue, true);
         setState(userdataPfad + '.Scale', cardLChartScale, true);
 
-        if (Debug) console.log(cardLChartScale);
-        if (Debug) console.log(cardLChartValue);
-
+        if (Debug) log(cardLChartScale);
+        if (Debug) log(cardLChartValue);
+        }
     });
 });
