@@ -10,18 +10,18 @@
  * Die Y-Skala errechnet sich aus min und max Werten der ausgelesen Werte der Datenbank
  * 
  * Beispiel für die Pagedefinition
- * let CardBChartBuero = <PageChart>
+ * let CardBChartBuero.PageType =
 {
     "type": "cardChart",
     "heading": "Heizung",
     "useColor": true,
     "subPage": false,
-    "items": [<PageItem>{ 
+    "items": [/*PageItem*/{ 
                 id: 'alias.0.NSPanel.allgemein.Charts.Heizung', 
                 yAxis: 'Leistung [kWh]', 
                 yAxisTicks: 'alias.0.NSPanel.allgemein.Charts.Heizung.SCALE',
                 onColor: Yellow
-             }]
+             }];
 };
  *
  *
@@ -39,21 +39,21 @@ const Debug = false;
 async function Init_Datenpunkte() {
     try {
         if (existsObject(userdataPfad) == false) {
-            console.log('Datenpunkte werden angelegt')
+            log('Datenpunkte werden angelegt')
             let deviceName: Array<string> = userdataPfad.split('.')
             await createStateAsync(userdataPfad + '.Werte', '', { name: 'SensorWerte', desc: 'Sensor Werte [~<time>:<value>]*', type: 'string', role: 'value'});
             await createStateAsync(userdataPfad + '.Scale', '', { name: 'YScaleGrid', desc: 'Skala Y Achse', type: 'string', role: 'value'});
             setObject(aliasPfad, { type: 'channel', common: { role: 'info', name: { de: deviceName[deviceName.length], en: deviceName[deviceName.length] } }, native: {} });
             await createAliasAsync(aliasPfad + '.ACTUAL', userdataPfad + '.Werte', true, <iobJS.StateCommon>{ type: 'string', role: 'value', name: { de: 'Sensor Werte', en: 'Sensor Values' } });
             await createAliasAsync(aliasPfad + '.SCALE', userdataPfad + '.Scale', true, <iobJS.StateCommon>{ type: 'string', role: 'value', name: { de: 'Skala Y Achse', en: 'Scale Y Axis' } });
-            console.log('Fertig')
+            log('Fertig')
         } else {
-            console.log('Datenpunkte vorhanden')
+            log('Datenpunkte vorhanden')
         };
     } catch (err) {
-        console.warn('error at function Init_Datenpunkte: ' + err.message);
-    };
-};
+        log('error at function Init_Datenpunkte: ' + err.message, 'warn');
+    }
+}
 Init_Datenpunkte();
 
 
@@ -68,6 +68,9 @@ on({id: sourceDP, change: "any"}, async function (obj) {
             aggregate: 'none'
         }
     }, function (result) {
+        if (result.error){
+            log('Abfragefehler: ' + result.error, 'error');
+        }else{
         let cardChartString = "";
 
             //Check history items for requested hours
@@ -75,7 +78,7 @@ on({id: sourceDP, change: "any"}, async function (obj) {
                 let valueDate = new Date(result.result[j].ts - 86400000);
                 let value = result.result[j].val;
 
-                if (Debug) console.log(valueDate + '  ' + valueDate.getDate()); 
+                if (Debug) log(valueDate + '  ' + valueDate.getDate()); 
 
                 switch (j) {
 
@@ -98,6 +101,7 @@ on({id: sourceDP, change: "any"}, async function (obj) {
             setState(valueDP, cardChartString, true);
         }
         
-        if (Debug) console.log(cardChartString); 
+        if (Debug) log(cardChartString); 
+        }
     }); 
 });
