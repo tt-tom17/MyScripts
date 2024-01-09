@@ -6,9 +6,10 @@
  * im ioBrocker Forum gibt es hier den pasenden Beitrag https://forum.iobroker.net/topic/48700
  * 
  * Der Ursprung zu diesem Script stammt von Stephan Kreyenborg 
- * Skript Version:    1.3
+ * Skript Version:    1.4
  * Erstell-Datum:    29. November 2021
  * 
+ * - 09.01.2024 - v1.4 Refactoring
  * 
  */
 
@@ -22,27 +23,27 @@ const MB_bit: number =8388608;
 
 // Favorisierter Server
 // Liste: https://www.speedtest.net/speedtest-servers.php
-var fav_server = 0; // 53128 Wolfsburg
+const fav_server = 0; // 53128 Wolfsburg
 
 function speedtest() {
 
     // Kommando für den Speedtest
-    var kommando = "/usr/bin/speedtest -f json --accept-license --accept-gdpr";
+    let kommando = "/usr/bin/speedtest -f json --accept-license --accept-gdpr";
     if (fav_server > 0) {
         kommando = kommando + " -s " + fav_server;
-        console.log("Speedtest mit Server " + fav_server + " gestartet! Der Test dauert zwischen 10 - 20 Sekunden!");
+        log("Speedtest mit Server " + fav_server + " gestartet! Der Test dauert zwischen 10 - 20 Sekunden!");
     } else {
-        console.log("Speedtest gestartet! Der Test dauert zwischen 10 - 20 Sekunden!");
+        log("Speedtest gestartet! Der Test dauert zwischen 10 - 20 Sekunden!");
     }
     exec(kommando,
         function (error, stdout) {
             if (error) {
-                console.log('Speedtest konnte nicht ausgeführt werden! ' + error, 'error');
+                log('Speedtest konnte nicht ausgeführt werden! ' + error, 'error');
                 return;
             } else {
-                //console.log(stdout)
+                //log(stdout)
                 aktualisiere_datenpunkt(stdout)
-                console.log('Speedtest durchgeführt. Ergebnisse: Download: ' + parseFloat((JSON.parse(stdout).download.bandwidth / Mbit_byte).toFixed(2)) + ' Mbit/s | Upload: ' + parseFloat((JSON.parse(stdout).upload.bandwidth / Mbit_byte).toFixed(2)) + ' MBit/s | Ping: ' + JSON.parse(stdout).ping.latency + ' ms');
+                log('Speedtest durchgeführt. Ergebnisse: Download: ' + parseFloat((JSON.parse(stdout).download.bandwidth / Mbit_byte).toFixed(2)) + ' Mbit/s | Upload: ' + parseFloat((JSON.parse(stdout).upload.bandwidth / Mbit_byte).toFixed(2)) + ' MBit/s | Ping: ' + JSON.parse(stdout).ping.latency + ' ms');
             }
         });
 }
@@ -74,21 +75,18 @@ function aktualisiere_datenpunkt(JSON_Daten: string) {
     setState(DP_userdata + 'Speedtest.Test.Daten.DauerDownload', parseFloat((JSON.parse(JSON_Daten).download.elapsed / 1000).toFixed(2)), true);
     setState(DP_userdata + 'Speedtest.Test.Daten.DauerUpload', parseFloat((JSON.parse(JSON_Daten).upload.elapsed / 1000).toFixed(2)), true);
     setState(DP_userdata + 'Speedtest.Test.Daten.Letzter_Speedtest', formatDate(new Date(), "TT.MM.JJJJ SS:mm:ss"), true);
-
-
-
 }
 
 // Erstelle die benötigten Datenpunkte
 function datenpunkte_erstellen() {
     init_DatenpunkteErstellen(true)
     // Alle Datenpunkte erstellt. Führe ersten Speedtest aus!
-    console.log('Speedtest: Erster Speedtest wird in 30 Sekunden ausgeführt!');
+    log('Speedtest: Erster Speedtest wird in 30 Sekunden ausgeführt!');
     setTimeout(speedtest, 30000);
 }
 
 function speedtest_erster_start() {
-    console.log("Speedtest: Erster Start des Skriptes!");
+    log("Speedtest: Erster Start des Skriptes!");
     // Datenpunkte werden erstellt
     datenpunkte_erstellen();
 }
@@ -101,7 +99,7 @@ schedule('*/60 * * * *', speedtest);
 
 async function init_DatenpunkteErstellen(newCreated: boolean) {
     if (!existsObject(DP_userdata + 'Speedtest')) {
-        console.log('Datenpunkte werden erstellt');
+        log('Datenpunkte werden erstellt');
         await createStateAsync(DP_userdata + 'Speedtest.JSON_OUTPUT', '', newCreated, { name: 'JSON Ausgabe der Konsole', type: 'string', role: 'json' });
         await createStateAsync(DP_userdata + 'Speedtest.Ergebnisse.Ping', 0, newCreated, { name: 'Ping in ms', type: 'number', role: 'value', unit: 'ms' });
         await createStateAsync(DP_userdata + 'Speedtest.Ergebnisse.Jitter', 0, newCreated, { name: 'Jitter in ms', type: 'number', role: 'value', unit: 'ms' });
@@ -128,6 +126,6 @@ async function init_DatenpunkteErstellen(newCreated: boolean) {
         await createStateAsync(DP_userdata + 'Speedtest.Test.Daten.DauerDownload', 0, newCreated, { name: 'Dauer des Download Test', type: 'number', role: 'value', unit: 's' });
         await createStateAsync(DP_userdata + 'Speedtest.Test.Daten.DauerUpload', 0, newCreated, { name: 'Dauer des Upload Test', type: 'number', role: 'value', unit: 's' });
         await createStateAsync(DP_userdata + 'Speedtest.Test.Daten.Letzter_Speedtest', '', newCreated, { name: 'Letzter Speedtest', type: 'string', role: 'text' });
-        console.log('Datenpunkte fertig');
-    };
-};
+        log('Datenpunkte fertig');
+    }
+}
