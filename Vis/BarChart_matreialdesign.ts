@@ -54,7 +54,7 @@ createState(valueDP, "", {
 });
 
 on({ id: triggerDP, change: "any" }, async function (obj) {
-    if (Debug) console.log('Trigger Wert ' + obj.state.val)
+    if (Debug) log('Trigger Wert ' + obj.state.val)
 
     switch (obj.state.val) {
         case '7 days':
@@ -87,7 +87,7 @@ on({ id: triggerDP, change: "any" }, async function (obj) {
             source = sourceDP_Month;
 
         default:
-            console.log('keine zeitraum selektiert')
+            log('keine zeitraum selektiert')
             break;
     };
 
@@ -108,13 +108,13 @@ async function datenAbruf_HistoryDB(sourceDP: string, range: number) {
     }, function (result) {
         let cardChartString: string = '[';
 
-        for (var j = 0; j < result.result.length; j++) {
+        for (let j = 0; j < result.result.length; j++) {
             let valueDate = new Date(result.result[j].ts - 86400000);
             let value = result.result[j].val;
 
-            if (Debug) console.log(value);
-            if (Debug) console.log(valueDate + '  ' + valueDate.getDate());
-            if (Debug) console.log(valueDate + '  ' + (valueDate.getMonth() + 1));
+            if (Debug) log(value);
+            if (Debug) log(valueDate + '  ' + valueDate.getDate());
+            if (Debug) log(valueDate + '  ' + (valueDate.getMonth() + 1));
 
 
             if (value != null && formatDate(valueDate,'hh:mm')== '00:00') {
@@ -132,7 +132,7 @@ async function datenAbruf_HistoryDB(sourceDP: string, range: number) {
             setState(valueDP, cardChartString, true);
         }
 
-        if (Debug) console.log(cardChartString);
+        if (Debug) log(cardChartString);
     });
 };
 
