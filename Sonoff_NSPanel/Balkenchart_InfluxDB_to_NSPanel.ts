@@ -14,17 +14,17 @@
  * Zusammenstellung des Querys die Konstante 'aliasInfluxDP' einzusetzen.
  * 
  * Beispiel für die Pagedefinition
- * let CardLChart = <PageChart>
+ * let CardLChart.PageType =
     {
     "type": "cardLChart",
     "heading": "Außentemperatur",
     "useColor": true,
-    'items': [<PageItem>{ 
+    'items': [/*PageItem*/{ 
                 id: 'alias.0.NSPanel.allgemein.Charts.AussenTemp',
                 yAxis: 'Temperatur [°C]',
                 yAxisTicks: 'alias.0.NSPanel.allgemein.Charts.AussenTemp.SCALE',
                 onColor: Yellow
-             }]
+             }];
     };
  *
  *
@@ -50,19 +50,19 @@ const Debug = false;
 async function Init_Datenpunkte() {
     try {
         if (existsObject(userdataPfad) == false) {
-            console.log('Datenpunkte werden angelegt')
+            log('Datenpunkte werden angelegt')
             let deviceName: Array<string> = userdataPfad.split('.')
             await createStateAsync(userdataPfad + '.Werte', '', { name: 'SensorWerte', desc: 'Sensor Werte [~<time>:<value>]*', type: 'string', role: 'value' });
             await createStateAsync(userdataPfad + '.Scale', '', { name: 'YScaleGrid', desc: 'Skala Y Achse', type: 'string', role: 'value' });
             setObject(aliasPfad, { type: 'channel', common: { role: 'info', name: { de: deviceName[deviceName.length], en: deviceName[deviceName.length] } }, native: {} });
             await createAliasAsync(aliasPfad + '.ACTUAL', userdataPfad + '.Werte', true, <iobJS.StateCommon>{ type: 'string', role: 'value', name: { de: 'Sensor Werte', en: 'Sensor Values' } });
             await createAliasAsync(aliasPfad + '.SCALE', userdataPfad + '.Scale', true, <iobJS.StateCommon>{ type: 'string', role: 'value', name: { de: 'Skala Y Achse', en: 'Scale Y Axis' } });
-            console.log('Fertig')
+            log('Fertig')
         } else {
-            console.log('Datenpunkte vorhanden')
+            log('Datenpunkte vorhanden')
         };
     } catch (err) {
-        console.warn('error at function Init_Datenpunkte: ' + err.message);
+        log('error at function Init_Datenpunkte: ' + err.message,'warn');
     };
 };
 Init_Datenpunkte();
@@ -82,14 +82,14 @@ on({ id: sourceDP, change: 'any' }, async function (obj) {
         '|> map(fn: (r) => ({ r with _rtime: int(v: r._time) - int(v: r._start)}))',
         '|> yield(name: "_result")'].join('');
 
-    if (Debug) console.log('Query: ' + query);
+    if (Debug) log('Query: ' + query);
 
     sendTo(InfluxInstance, 'query', query, function (result) {
         if (result.error) {
-            console.error(result.error);
+            log('sendTo Fehler: ' + result.error, 'error');
         } else {
             // show result
-            if (Debug) console.log(result);
+            if (Debug) log(result);
 
             for (let r = 0; r < result.result.length; r++) {
                 for (let i = 0; i < result.result[r].length; i++) {
@@ -97,7 +97,7 @@ on({ id: sourceDP, change: 'any' }, async function (obj) {
                     let value = Math.round(result.result[r][i]._value * 10);
                     scale.push(value);
 
-                    if (Debug) console.log('ts: '+valueDate + '  getDate: ' + valueDate.getDate());
+                    if (Debug) log('ts: '+valueDate + '  getDate: ' + valueDate.getDate());
 
                     switch (i) {
                         case 0:
@@ -112,7 +112,7 @@ on({ id: sourceDP, change: 'any' }, async function (obj) {
                     };
                 };
             };
-            if (Debug) console.log('Werte: ' + cardChartString);
+            if (Debug) log('Werte: ' + cardChartString);
             cardChartString = cardChartString.substring(0, cardChartString.length - 1);
         }
     });
@@ -125,7 +125,7 @@ on({ id: sourceDP, change: 'any' }, async function (obj) {
 
             max = Math.max(...scale);
 
-            if (Debug) console.log('max Wert ' + max);
+            if (Debug) log('max Wert ' + max);
 
             intervall = Math.round(max / 4);
             scaleList.push(String(min));
