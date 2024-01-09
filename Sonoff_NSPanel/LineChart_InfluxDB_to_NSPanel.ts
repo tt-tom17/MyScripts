@@ -14,17 +14,17 @@
  * Zusammenstellung des Querys die Konstante 'aliasInfluxDP' einzusetzen.
  * 
  * Beispiel für die Pagedefinition
- * let CardLChart = <PageChart>
+ * let CardLChart.PageType =
     {
     "type": "cardLChart",
     "heading": "Außentemperatur",
     "useColor": true,
-    'items': [<PageItem>{ 
+    'items': [/*PageItem*/{ 
                 id: 'alias.0.NSPanel.allgemein.Charts.AussenTemp',
                 yAxis: 'Temperatur [°C]',
                 yAxisTicks: 'alias.0.NSPanel.allgemein.Charts.AussenTemp.SCALE',
                 onColor: Yellow
-             }]
+             }];
     };
  *
  *
@@ -51,19 +51,19 @@ const Debug = false;
 async function Init_Datenpunkte() {
     try {
         if (existsObject(userdataPfad) == false) {
-            console.log('Datenpunkte werden angelegt')
+            log('Datenpunkte werden angelegt')
             let deviceName: Array<string> = userdataPfad.split('.')
             await createStateAsync(userdataPfad + '.Werte', '', { name: 'SensorWerte', desc: 'Sensor Werte [~<time>:<value>]*', type: 'string', role: 'value' });
             await createStateAsync(userdataPfad + '.Scale', '', { name: 'YScaleGrid', desc: 'Skala Y Achse', type: 'string', role: 'value' });
             setObject(aliasPfad, { type: 'channel', common: { role: 'info', name: { de: deviceName[deviceName.length], en: deviceName[deviceName.length] } }, native: {} });
             await createAliasAsync(aliasPfad + '.ACTUAL', userdataPfad + '.Werte', true, <iobJS.StateCommon>{ type: 'string', role: 'value', name: { de: 'Sensor Werte', en: 'Sensor Values' } });
             await createAliasAsync(aliasPfad + '.SCALE', userdataPfad + '.Scale', true, <iobJS.StateCommon>{ type: 'string', role: 'value', name: { de: 'Skala Y Achse', en: 'Scale Y Axis' } });
-            console.log('Fertig')
+            log('Fertig')
         } else {
-            console.log('Datenpunkte vorhanden')
+            log('Datenpunkte vorhanden')
         };
     } catch (err) {
-        console.warn('error at function Init_Datenpunkte: ' + err.message);
+        log('error at function Init_Datenpunkte: ' + err.message, 'warn');
     };
 };
 Init_Datenpunkte();
@@ -84,14 +84,14 @@ let scale: Array<number> = [];
         '|> map(fn: (r) => ({ r with _rtime: int(v: r._time) - int(v: r._start)}))',
         '|> yield(name: "_result")'].join('');
 
-    if (Debug) console.log('Query: ' + query);
+    if (Debug) log('Query: ' + query);
 
     sendTo(InfluxInstance, 'query', query, function (result) {
         if (result.error) {
-            console.error(result.error);
+            log('sendTo: ' + result.error, 'error');
         } else {
             // show result
-            if (Debug) console.log(result);
+            if (Debug) log(result);
 
             for (let r = 0; r < result.result.length; r++) {
                 for (let i = 0; i < result.result[r].length; i++) {
@@ -103,7 +103,7 @@ let scale: Array<number> = [];
 
                 coordinates = list.join("~");
 
-                if (Debug) console.log(coordinates);
+                if (Debug) log(coordinates);
             }
         }
     });
@@ -115,7 +115,7 @@ let scale: Array<number> = [];
             date.setMinutes(0, 0, 0);
             let ts: number = Math.round(date.getTime() / 1000);
             let tsYesterday: number = ts - (zeitSpanne * 3600);
-            if (Debug) console.log('Iterate from ' + tsYesterday + ' to ' + ts + ' stepsize=' + (xAchseStrich * 60));
+            if (Debug) log('Iterate from ' + tsYesterday + ' to ' + ts + ' stepsize=' + (xAchseStrich * 60));
             for (let x = tsYesterday, i = 0; x < ts; x += (xAchseStrich * 60), i += xAchseStrich) {
                 if ((i % xAchseLabel))
                     ticksAndLabelsList.push(String(i));
@@ -132,8 +132,8 @@ let scale: Array<number> = [];
             }
             ticksAndLabels = ticksAndLabelsList.join("+");
 
-            if (Debug) console.log('Ticks & Label: ' + ticksAndLabels);
-            if (Debug) console.log('Coordinates: ' + coordinates);
+            if (Debug) log('Ticks & Label: ' + ticksAndLabels);
+            if (Debug) log('Coordinates: ' + coordinates);
 
         let scaleList: Array<string> = [];
         let max = 0;
@@ -143,8 +143,8 @@ let scale: Array<number> = [];
         max = Math.max(...scale);
         min = Math.min(...scale);
 
-        if (Debug) console.log('min Wert ' + min);
-        if (Debug) console.log('max Wert ' + max);
+        if (Debug) log('min Wert ' + min);
+        if (Debug) log('max Wert ' + max);
 
         intervall = max - min;
         intervall = Math.round(intervall / 4);
