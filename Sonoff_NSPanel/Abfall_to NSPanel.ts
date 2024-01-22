@@ -1,7 +1,7 @@
 /*
  * @author 2023 @tt-tom
  * 
- * Version 5.1.0
+ * Version 5.1.1
  * 
  * Das Script erstellt die Datenpunkte und Alias für den Abfallkalender im Sonoff NSPanel
  * Es wird der iCal Adapter benötigt und eine URL mit Terminen vom Entsorger bzw. eine .ics-Datei mit den Terminen.
@@ -11,6 +11,7 @@
  * changelog
  *  - 06.12.2023 - v5.0.2 add custom name for trashtype
  *  - 06.12.2023 - v5.1.0 Refactoring
+ *  - 22.01.2024 - v5.1.1 Add tow Events more
  * 
  * 
 */
@@ -22,15 +23,18 @@ const idAliasPanelVerzeichnis: string = 'alias.0.NSPanel.allgemein'; //Name Pane
 const idAliasAbfallVerzeichnis: string = 'Abfall'; //Name Verzeichnis unterhalb der idPanelverzeichnis  Standard = Abfall
 
 const anzahlZeichenLoeschen: number = 0; // x Zeichen links vom String abziehen, wenn vor dem Eventname noch Text steht z.B. Strassenname; Standard = 0
-const jsonEventName1: string = 'Gelbe Tonne, Biotonne, Restmülltonne'; // Vergleichstring für Schwarze Tonne
-const customEventName1: string = 'Ohne Papiertonne';        // benutzerdefinierter Text für schwarze Tonne
+const jsonEventName1: string = 'Restmüll'; // Vergleichstring für Schwarze Tonne
+const customEventName1: string = 'schwarze Tonne';        // benutzerdefinierter Text für schwarze Tonne
 const jsonEventName2: string = 'Gelbe Sack'; // Vergleichstring für Gelbe Tonne / Sack
 const customEventName2: string = '';        // benutzerdefinierter Text für gelbe Tonne
-const jsonEventName3: string = 'Gelbe Tonne, Biotonne, Restmülltonne, Blaue Papiertonne, Restmülltonne 4-wöchentlich';    // Vergleichstring für Blaue Tonne
-const customEventName3: string = 'Mit Papiertonne';       // benutzerdefinierter Text für blaue Tonne
+const jsonEventName3: string = 'Papiertonne';    // Vergleichstring für Blaue Tonne
+const customEventName3: string = 'blaue Tonne';       // benutzerdefinierter Text für blaue Tonne
 const jsonEventName4: string = 'Biomüll';   // Vergleichstring für Braune Tonne
 const customEventName4: string = '';        // benutzerdefinierter Text für braune Tonne
-
+const jsonEventName5: string = 'Hausreinigung';   // Vergleichstring für Event 5
+const customEventName5: string = 'Besen schwingen';        // benutzerdefinierter Text für Event 5
+const jsonEventName6: string = '';   // Vergleichstring für Event 6
+const customEventName6: string = '';        // benutzerdefinierter Text für Event 6
 
 const Debug: boolean = true;
 
@@ -65,7 +69,7 @@ async function JSON_auswerten() {
         if (Debug) log('Anzahl Trash - Daten: ' + trashJSON.length, 'info');
 
         for (let i = 0; i < trashJSON.length; i++) {
-            if (abfallNummer === 5) {
+            if (abfallNummer === 7) {
                 if (Debug) log('Alle Abfall-Datenpunkte gefüllt', 'warn');
                 break;
             }
@@ -120,8 +124,23 @@ async function JSON_auswerten() {
                                 if (Debug) log('Event customName: ' + eventName, 'info');
                             };
                             break;
+                        case jsonEventName5:
+                            farbNummer = 2016;
+                            if (customEventName5 != '') {
+                                eventName = customEventName4;
+                                if (Debug) log('Event customName: ' + eventName, 'info');
+                            };
+                            break;
+                        case jsonEventName6:
+                            farbNummer = 2016;
+                            if (customEventName6 != '') {
+                                eventName = customEventName4
+                                if (Debug) log('Event customName: ' + eventName, 'info');
+                            };
+                            break;
                     }
-                    if (farbString != undefined) farbNummer = rgb_dec565(hex_rgb(farbString));
+                
+                    //if (farbString != undefined) farbNummer = rgb_dec565(hex_rgb(farbString));
 
 
                     setState(idUserdataAbfallVerzeichnis + '.' + String(abfallNummer) + '.date', eventDatum);
@@ -129,7 +148,7 @@ async function JSON_auswerten() {
                     setState(idUserdataAbfallVerzeichnis + '.' + String(abfallNummer) + '.color', farbNummer);
 
 
-                    if (Debug) log('farbString: ' + farbString + ' farbNummer: ' + farbNummer, 'info');
+                    //if (Debug) log('farbString: ' + farbString + ' farbNummer: ' + farbNummer, 'info');
                     if (Debug) log('Abfallnummer: ' + abfallNummer, 'info');
 
                     abfallNummer += 1
@@ -151,7 +170,7 @@ async function JSON_auswerten() {
 
 async function Init_Datenpunkte() {
     try {
-        for (let i = 1; i <= 4; i++) {
+        for (let i = 1; i <= 6; i++) {
             if (existsObject(idUserdataAbfallVerzeichnis + '.' + String(i)) == false) {
                 log('Datenpunkt ' + idUserdataAbfallVerzeichnis + '.' + String(i) + ' werden angelegt', 'info')
                 await createStateAsync(idUserdataAbfallVerzeichnis + '.' + String(i) + '.date', '', { type: 'string' });
