@@ -31,7 +31,7 @@ const jsonEventName3: string = 'Papiertonne';    // Vergleichstring für Blaue T
 const customEventName3: string = 'blaue Tonne';       // benutzerdefinierter Text für blaue Tonne
 const jsonEventName4: string = 'Biomüll';   // Vergleichstring für Braune Tonne
 const customEventName4: string = '';        // benutzerdefinierter Text für braune Tonne
-const jsonEventName5: string = 'Hausreinigung';   // Vergleichstring für Event 5
+const jsonEventName5: string = 'Treppe';   // Vergleichstring für Event 5
 const customEventName5: string = 'Besen schwingen';        // benutzerdefinierter Text für Event 5
 const jsonEventName6: string = '';   // Vergleichstring für Event 6
 const customEventName6: string = '';        // benutzerdefinierter Text für Event 6
@@ -93,7 +93,7 @@ async function JSON_auswerten() {
             if (Debug) log('Kontrolle Leerzeichen %' + eventName + '%', 'info');
 
             if (d.getTime() <= d1.getTime()) {
-                if ((eventName == jsonEventName1) || (eventName == jsonEventName2) || (eventName == jsonEventName3) || (eventName == jsonEventName4)) {
+                if ((eventName == jsonEventName1) || (eventName == jsonEventName2) || (eventName == jsonEventName3) || (eventName == jsonEventName4) || (eventName == jsonEventName5) || (eventName == jsonEventName6)) {
 
                     switch (eventName) {
                         case jsonEventName1:
@@ -127,14 +127,14 @@ async function JSON_auswerten() {
                         case jsonEventName5:
                             farbNummer = 2016;
                             if (customEventName5 != '') {
-                                eventName = customEventName4;
+                                eventName = customEventName5;
                                 if (Debug) log('Event customName: ' + eventName, 'info');
                             };
                             break;
                         case jsonEventName6:
                             farbNummer = 2016;
                             if (customEventName6 != '') {
-                                eventName = customEventName4
+                                eventName = customEventName6
                                 if (Debug) log('Event customName: ' + eventName, 'info');
                             };
                             break;
