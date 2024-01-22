@@ -1,8 +1,8 @@
 
-/*
+/**
  * @author 2023 @tt-tom
  * 
- * Version 1.0.2
+ * Version 1.0.3
  * 
  * Das Script erstellt die Datenpunkte und Alias für den ChartLCard im Sonoff NSPanel
  * Es liest aus der InFluxDB Werte eines Datenpunktes und erstellt daraus das Array für die Y-Skala und
@@ -14,18 +14,17 @@
  * Zusammenstellung des Querys die Konstante 'aliasInfluxDP' einzusetzen.
  * 
  * Beispiel für die Pagedefinition
- * let CardLChart.PageType =
-    {
-    "type": "cardLChart",
-    "heading": "Außentemperatur",
-    "useColor": true,
-    'items': [/*PageItem*/{ 
-                id: 'alias.0.NSPanel.allgemein.Charts.AussenTemp',
-                yAxis: 'Temperatur [°C]',
-                yAxisTicks: 'alias.0.NSPanel.allgemein.Charts.AussenTemp.SCALE',
-                onColor: Yellow
-             }];
-    };
+ * let CardLChart:PageType =
+ *   {
+ *   "type": "cardLChart",
+ *   "heading": "Außentemperatur",
+ *   'items': [/*PageItem*/{ 
+ *               id: 'alias.0.NSPanel.allgemein.Charts.AussenTemp',
+ *               yAxis: 'Temperatur [°C]',
+ *               yAxisTicks: 'alias.0.NSPanel.allgemein.Charts.AussenTemp.SCALE',
+ *               onColor: Yellow
+ *            }];
+ *   };
  *
  *
  * Weitere Informationen findest du in der FAQ auf Github https://github.com/joBr99/nspanel-lovelace-ui/wiki
@@ -43,6 +42,7 @@ const xAchseLabel: number = 240;  // Zeit in Minuten, nachdem x-Achse Wert bekom
 
 
 const InfluxInstance: string = 'influxdb.0';
+const BucketName: string = 'storage_short';
 
 
 const Debug = false;
@@ -75,7 +75,7 @@ let list: Array<string> = [];
 let scale: Array<number> = [];
 
     let query = [
-        'from(bucket: "iobtest")',
+        'from(bucket: "' + BucketName + '")',
         '|> range(start: -' + zeitSpanne + 'h)',
         '|> filter(fn: (r) => r["_measurement"] == "' + sourceDP + '")', // bei Nutzung der Alias-ID -> sourceDP durch aliasInfluxDP ersetzen
         '|> filter(fn: (r) => r["_field"] == "value")',
