@@ -2,7 +2,10 @@
 /**
  * @author 2023 @tt-tom
  * 
- * Version 1.0.3
+ * Version 1.0.4
+ * 
+ * Changelog
+ * - 31.01.24 - Berechnung der Werte für die y-Achse werden im NSPanel.ts Script durchgeführt
  * 
  * Das Script erstellt die Datenpunkte und Alias für den ChartLCard im Sonoff NSPanel
  * Es liest aus der InFluxDB Werte eines Datenpunktes und erstellt daraus das Array für die Y-Skala und
@@ -18,10 +21,9 @@
  *   {
  *   "type": "cardLChart",
  *   "heading": "Außentemperatur",
- *   'items': [/*PageItem*/{ 
+ *   'items': [{ 
  *               id: 'alias.0.NSPanel.allgemein.Charts.AussenTemp',
  *               yAxis: 'Temperatur [°C]',
- *               yAxisTicks: 'alias.0.NSPanel.allgemein.Charts.AussenTemp.SCALE',
  *               onColor: Yellow
  *            }];
  *   };
@@ -72,7 +74,6 @@ on({ id: sourceDP, change: 'any' }, async function (obj) {
 let ticksAndLabels: string = '';
 let coordinates: string = '';
 let list: Array<string> = [];
-let scale: Array<number> = [];
 
     let query = [
         'from(bucket: "' + BucketName + '")',
@@ -98,7 +99,6 @@ let scale: Array<number> = [];
                     let time: number = Math.round(result.result[r][i]._rtime / 1000 / 1000 / 1000 / 60);
                     let value: number = Math.round(result.result[r][i]._value * 10);
                     list.push(time + ":" + value);
-                    scale.push(value);
                 }
 
                 coordinates = list.join("~");
@@ -135,31 +135,7 @@ let scale: Array<number> = [];
             if (Debug) log('Ticks & Label: ' + ticksAndLabels);
             if (Debug) log('Coordinates: ' + coordinates);
 
-        let scaleList: Array<string> = [];
-        let max = 0;
-        let min = 0;
-        let intervall = 0;
-
-        max = Math.max(...scale);
-        min = Math.min(...scale);
-
-        if (Debug) log('min Wert ' + min);
-        if (Debug) log('max Wert ' + max);
-
-        intervall = max - min;
-        intervall = Math.round(intervall / 4);
-        scaleList.push(String(min));
-
-        for (let count = 0; count < 4; count++) {
-            min = Math.round(min + intervall);
-            scaleList.push(String(min));
-        }
-
-
             setState(userdataPfad + '.Werte', ticksAndLabels + '~' + coordinates, true);
-            setState(userdataPfad + '.Scale', "[" + scaleList.join(",") + "]", true);
 
-        },
-        1500
-    );
+        1500});
 });

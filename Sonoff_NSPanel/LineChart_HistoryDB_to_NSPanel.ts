@@ -1,7 +1,11 @@
 /*
  * @author 2023 @tt-tom
  * 
- * Version 1.0.1
+ * Version 1.0.2
+ * 
+ * Changelog
+ * 
+ * - 31.01.24 - Berechnung der Werte für die y-Achse werden im NSPanel.ts Script durchgeführt
  * 
  * Das Script erstellt die Datenpunkte und Alias für den ChartLCard im Sonoff NSPanel
  * Es liest aus der History DB Werte eines Datenpunktes und erstellt daraus das Array für die Y-Skala und
@@ -15,10 +19,9 @@
     "type": "cardLChart",
     "heading": "Außentemperatur",
     "useColor": true,
-    'items': [/*PageItem*/{ 
+    'items': [{ 
                 id: 'alias.0.NSPanel.allgemein.Charts.AussenTemp',
                 yAxis: 'Temperatur [°C]',
-                yAxisTicks: 'alias.0.NSPanel.allgemein.Charts.AussenTemp.SCALE',
                 onColor: Yellow
              }];
     };
@@ -46,10 +49,8 @@ async function Init_Datenpunkte() {
             log('Datenpunkte werden angelegt')
             let deviceName: Array<string> = userdataPfad.split('.')
             await createStateAsync(userdataPfad + '.Werte', '', { name: 'SensorWerte', desc: 'Sensor Werte [~<time>:<value>]*', type: 'string', role: 'value'});
-            await createStateAsync(userdataPfad + '.Scale', '', { name: 'YScaleGrid', desc: 'Skala Y Achse', type: 'string', role: 'value'});
             setObject(aliasPfad, { type: 'channel', common: { role: 'info', name: { de: deviceName[deviceName.length], en: deviceName[deviceName.length] } }, native: {} });
             await createAliasAsync(aliasPfad + '.ACTUAL', userdataPfad + '.Werte', true, <iobJS.StateCommon>{ type: 'string', role: 'value', name: { de: 'Sensor Werte', en: 'Sensor Values' } });
-            await createAliasAsync(aliasPfad + '.SCALE', userdataPfad + '.Scale', true, <iobJS.StateCommon>{ type: 'string', role: 'value', name: { de: 'Skala Y Achse', en: 'Scale Y Axis' } });
             log('Fertig')
         } else {
             log('Datenpunkte vorhanden')
@@ -78,7 +79,6 @@ on({ id: sourceDP, change: "any" }, async function (obj) {
         let ticksAndLabels: string = '';
         let coordinates: string = '';
         let cardLChartValue: string = '';
-        let cardLChartScale: string = '';
 
 
         let ticksAndLabelsList: Array<string> = []
@@ -105,7 +105,6 @@ on({ id: sourceDP, change: "any" }, async function (obj) {
         ticksAndLabels = ticksAndLabelsList.join("+");
 
         let list: Array<string> = [];
-        let scale: Array<number> = [];
         let offSetTime = Math.round(result.result[0].ts / 1000);
         let counter = Math.round((result.result[result.result.length - 1].ts / 1000 - offSetTime) / maxX);
         for (let i = 0; i < result.result.length; i++) {
@@ -113,40 +112,14 @@ on({ id: sourceDP, change: "any" }, async function (obj) {
             let value: number = Math.round(result.result[i].val * 10);
             if ((value != null) && (value != 0)) {
                 list.push(time + ':' + value);
-                scale.push(value)
             }
         }
 
         coordinates = list.join("~");
         cardLChartValue = ticksAndLabels + '~' + coordinates;
 
-        let scaleList: Array<string> = [];
-        let max = 0;
-        let min = 0;
-        let intervall = 0;
-
-        max = Math.max(...scale);
-        min = Math.min(...scale);
-
-        if (Debug) log(min);
-        if (Debug) log(max);
-
-        intervall = max - min;
-        intervall = Math.round(intervall / 4);
-        scaleList.push(String(min));
-
-        for (let count = 0; count < 4; count++) {
-            min = Math.round(min + intervall);
-            scaleList.push(String(min));
-        }
-
-        cardLChartScale = "[" + scaleList.join(",") + "]"
-
-
         setState(userdataPfad + '.Werte', cardLChartValue, true);
-        setState(userdataPfad + '.Scale', cardLChartScale, true);
 
-        if (Debug) log(cardLChartScale);
         if (Debug) log(cardLChartValue);
         }
     });
