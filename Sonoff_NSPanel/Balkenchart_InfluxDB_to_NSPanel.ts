@@ -19,7 +19,7 @@
     "type": "cardLChart",
     "heading": "Außentemperatur",
     "useColor": true,
-    'items': [/*PageItem*/{ 
+    'items': [{ 
                 id: 'alias.0.NSPanel.allgemein.Charts.AussenTemp',
                 yAxis: 'Temperatur [°C]',
                 yAxisTicks: 'alias.0.NSPanel.allgemein.Charts.AussenTemp.SCALE',
