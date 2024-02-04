@@ -1,7 +1,7 @@
 /*
  * @author 2023 @tt-tom
  * 
- * Version 5.1.1
+ * Version 5.1.2
  * 
  * Das Script erstellt die Datenpunkte und Alias für den Abfallkalender im Sonoff NSPanel
  * Es wird der iCal Adapter benötigt und eine URL mit Terminen vom Entsorger bzw. eine .ics-Datei mit den Terminen.
@@ -12,6 +12,7 @@
  *  - 06.12.2023 - v5.0.2 add custom name for trashtype
  *  - 06.12.2023 - v5.1.0 Refactoring
  *  - 22.01.2024 - v5.1.1 Add tow Events more
+ *  - 04.02.2024 - v5.1.2 Add delChartLeft and delChartRight for trim the name of event of ical adapter
  * 
  * 
 */
@@ -22,10 +23,12 @@ const idUserdataAbfallVerzeichnis: string = '0_userdata.0.Abfallkalender'; // Na
 const idAliasPanelVerzeichnis: string = 'alias.0.NSPanel.allgemein'; //Name PanelVerzeichnis unter alias.0. Standard = alias.0.NSPanel.1
 const idAliasAbfallVerzeichnis: string = 'Abfall'; //Name Verzeichnis unterhalb der idPanelverzeichnis  Standard = Abfall
 
-const anzahlZeichenLoeschen: number = 0; // x Zeichen links vom String abziehen, wenn vor dem Eventname noch Text steht z.B. Strassenname; Standard = 0
+const delCharLeft: number = 0; // x Zeichen links vom Event abziehen, wenn vor dem Eventname noch Text steht z.B. Strassenname; Standard = 0
+const delCharRight: number = 0; // x Zeichen rechts vom Event abziehen, wenn nach dem Eventname noch Text steht z.B. ein Datum; Standard = 0
+
 const jsonEventName1: string = 'Restmüll'; // Vergleichstring für Schwarze Tonne
-const customEventName1: string = 'schwarze Tonne';        // benutzerdefinierter Text für schwarze Tonne
-const jsonEventName2: string = 'Gelbe Sack'; // Vergleichstring für Gelbe Tonne / Sack
+const customEventName1: string = 'schwarze tonne';        // benutzerdefinierter Text für schwarze Tonne
+const jsonEventName2: string = 'Gelber Sack'; // Vergleichstring für Gelbe Tonne / Sack
 const customEventName2: string = '';        // benutzerdefinierter Text für gelbe Tonne
 const jsonEventName3: string = 'Papiertonne';    // Vergleichstring für Blaue Tonne
 const customEventName3: string = 'blaue Tonne';       // benutzerdefinierter Text für blaue Tonne
@@ -75,7 +78,8 @@ async function JSON_auswerten() {
             }
 
             log('Daten vom ical Adapter werden ausgewertet', 'info');
-            eventName = getAttr(trashJSON, (String(i) + '.event')).slice(anzahlZeichenLoeschen, getAttr(trashJSON, (String(i) + '.event')).length);
+            eventName = getAttr(trashJSON, (String(i) + '.event'));
+            eventName = eventName.substring(delCharLeft, eventName.length - delCharRight);
             // Leerzeichen vorne und hinten löschen
             eventName = eventName.trimEnd();
             eventName = eventName.trimStart();
@@ -139,7 +143,7 @@ async function JSON_auswerten() {
                             };
                             break;
                     }
-                
+
                     //if (farbString != undefined) farbNummer = rgb_dec565(hex_rgb(farbString));
 
 
