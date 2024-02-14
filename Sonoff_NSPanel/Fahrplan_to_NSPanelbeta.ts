@@ -40,8 +40,8 @@ let info: string = '';
 /**
  * Einstellungen für Routen
  */
-const anzahlRouten: number = 2;               // Anzahl der Haltestellen / Anzeigetafeln
-const anzahlAbfahrtenRoute: number = 4;                     // Abfahrten an der Haltestelle -> mehr als 4 kann das NSPanel noch nicht anzeigen
+const anzahlRouten: number = 2;               // Anzahl der Routen
+const anzahlAbfahrtenRoute: number = 4;                     // Abfahrten an der Route -> mehr als 4 kann das NSPanel noch nicht anzeigen
 const verspaetungPopupRoute: boolean = true;             // Bei Verspätung soll PopupNotifypage auf dem Panel angezeigt werden
 const verspaetungszeitRoute: number = 300;               // Verspätungszeit in sek
 
