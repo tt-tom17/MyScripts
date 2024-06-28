@@ -13,7 +13,7 @@
  *  20.12.23 - v1.1.2 - Add mapping line.mode => Iconname
  *  23.12.23 - v1.1.3 - Add Button Info only for additional info
  *  14.02.24 - v1.2.0 - Add importing routes
- *  28.06.24 - v1.2.0 - Fix checking the number of routes
+ *  28.06.24 - v1.2.1 - Fix checking the number of routes
  * 
  * 
  * auslesen der Daten aus dem Adapter Fahrplan und zusammenstellen für das Sonoff NSPanel
