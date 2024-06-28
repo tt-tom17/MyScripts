@@ -13,6 +13,7 @@
  *  20.12.23 - v1.1.2 - Add mapping line.mode => Iconname
  *  23.12.23 - v1.1.3 - Add Button Info only for additional info
  *  14.02.24 - v1.2.0 - Add importing routes
+ *  28.06.24 - v1.2.0 - Fix checking the number of routes
  * 
  * 
  * auslesen der Daten aus dem Adapter Fahrplan und zusammenstellen für das Sonoff NSPanel
@@ -139,7 +140,7 @@ async function json_HaltestelleUmwandeln(json_Haltestelle: string, haltestelle: 
             for (let i = 0; i < haltestellenPlan.length; i++) {
 
                 if (i == anzahlAbfahrtenHaltestelle) {
-                    log(`Es werden nur die ersten ${anzahlAbfahrtenHaltestelle} Abfahrten pro Route eingelesen`, `warn`);
+                    log(`Es werden nur die ersten ${anzahlAbfahrtenHaltestelle} Abfahrten pro Haltestelle eingelesen`, `warn`);
                     break;
                 };
 
@@ -252,8 +253,8 @@ async function json_RouteUmwandeln(json_Route: string, route: string) {
 
         let h = route
 
-        if (parseInt(h) > anzahlAbfahrtenRoute) {
-            log(`Es werden Daten nur von ${anzahlAbfahrtenRoute} Route/n ausgewertet. Der Fahrplan-Adapter liefert aber mehr Daten. Ggf die Anzahl der Haltestellen im Script erhöhen.`);
+        if (parseInt(h) > anzahlRouten) {
+            log(`Es werden Daten nur von ${anzahlRouten} Route/n ausgewertet. Der Fahrplan-Adapter liefert aber mehr Daten. Ggf die Anzahl der Route im Script erhöhen.`);
             return;
         } else {
             if (json_Log) log(getState(json_Route).val);
@@ -262,7 +263,7 @@ async function json_RouteUmwandeln(json_Route: string, route: string) {
 
             let routenPlan: any = JSON.parse(getState(json_Route).val);
 
-            if (Debug) log(`Anzahl der Abfahrten Route ${h}: ${routenPlan.journeys.length}`);
+            if (Debug) log(`Anzahl der Abfahrten der Route ${h}: ${routenPlan.journeys.length}`);
 
             for (let i = 0; i < routenPlan.journeys.length; i++) {
                 if (i == anzahlAbfahrtenRoute) {
