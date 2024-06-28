@@ -4,7 +4,7 @@
  * Dieses Skript dient zur freien Verwendung in ioBroker.
  * Jegliche Verantwortung liegt beim Benutzer. 
  * 
- * Version 1.2.0
+ * Version 1.2.1
  *
  * Setzt NSPanel Script Version 4.3.1.5 oder größer voraus
  * 
