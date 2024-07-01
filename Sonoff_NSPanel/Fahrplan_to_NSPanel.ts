@@ -64,86 +64,22 @@ async function init_Datenpunkte() {
     for (let h = 0; h < NummernHaltestellen.length; h++) {
       let haltestelle: string = NummernHaltestellen[h];
       for (let i = 0; i < anzahlAbfahrtenHaltestelle; i++) {
-        if (existsObject(dp_Userdata + "FahrplanAnzeiger.Haltestelle" + haltestelle + ".Abfahrt" + String(i)) == false) {
+        if (existsObject(dp_Userdata + "FahrplanAnz  eiger.Haltestelle" + haltestelle + ".Abfahrt" + String(i)) == false) {
           log(`Datenpunkte für Haltestelle ${haltestelle} Abfahrt ${i} werden angelegt`);
-          await createStateAsync(dp_Userdata + "FahrplanAnzeiger.Haltestelle" + haltestelle + ".Abfahrt" + String(i) + ".Departure", "00:00", {
-            type: "string",
-            name: { de: "Abfahrzeit", en: "Departure time" },
-          });
-          await createStateAsync(dp_Userdata + "FahrplanAnzeiger.Haltestelle" + haltestelle + ".Abfahrt" + String(i) + ".Direction", "Hbf", {
-            type: "string",
-            name: { de: "Richtung", en: "Direction" },
-          });
-          await createStateAsync(dp_Userdata + "FahrplanAnzeiger.Haltestelle" + haltestelle + ".Abfahrt" + String(i) + ".Vehicle", "train", {
-            type: "string",
-            name: { de: "Fahrzeug", en: "Vehicle" },
-          });
-          await createStateAsync(dp_Userdata + "FahrplanAnzeiger.Haltestelle" + haltestelle + ".Abfahrt" + String(i) + ".Delay", false, {
-            type: "boolean",
-            name: { de: "Verspätung", en: "Delay" },
-          });
-          setObject(dp_Alias + "FahrplanAnzeiger.Haltestelle" + haltestelle, {
-            type: "device",
-            common: {
-              role: "timeTable",
-              name: {
-                de: "Haltestelle " + haltestelle,
-                en: "Station " + haltestelle,
-              },
-            },
-            native: {},
-          });
-          setObject(dp_Alias + "FahrplanAnzeiger.Haltestelle" + haltestelle + ".Abfahrt" + String(i), {
-            type: "channel",
-            common: {
-              role: "timeTable",
-              name: {
-                de: "Abfahrt " + String(i),
-                en: "Departure " + String(i),
-              },
-            },
-            native: {},
-          });
-          await createAliasAsync(
-            dp_Alias + "FahrplanAnzeiger.Haltestelle" + haltestelle + ".Abfahrt" + String(i) + ".ACTUAL",
-            dp_Userdata + "FahrplanAnzeiger.Haltestelle" + haltestelle + ".Abfahrt" + String(i) + ".Departure",
-            true,
-            <iobJS.StateCommon>{
-              type: "string",
-              role: "state",
-              name: { de: "Abfahrzeit", en: "Departure time" },
-            }
-          );
-          await createAliasAsync(
-            dp_Alias + "FahrplanAnzeiger.Haltestelle" + haltestelle + ".Abfahrt" + String(i) + ".DIRECTION",
-            dp_Userdata + "FahrplanAnzeiger.Haltestelle" + haltestelle + ".Abfahrt" + String(i) + ".Direction",
-            true,
-            <iobJS.StateCommon>{
-              type: "string",
-              role: "state",
-              name: { de: "Richtung", en: "Direction" },
-            }
-          );
-          await createAliasAsync(
-            dp_Alias + "FahrplanAnzeiger.Haltestelle" + haltestelle + ".Abfahrt" + String(i) + ".VEHICLE",
-            dp_Userdata + "FahrplanAnzeiger.Haltestelle" + haltestelle + ".Abfahrt" + String(i) + ".Vehicle",
-            true,
-            <iobJS.StateCommon>{
-              type: "string",
-              role: "state",
-              name: { de: "Fahrzeug", en: "Vehicle" },
-            }
-          );
-          await createAliasAsync(
-            dp_Alias + "FahrplanAnzeiger.Haltestelle" + haltestelle + ".Abfahrt" + String(i) + ".DELAY",
-            dp_Userdata + "FahrplanAnzeiger.Haltestelle" + haltestelle + ".Abfahrt" + String(i) + ".Delay",
-            true,
-            <iobJS.StateCommon>{
-              type: "boolean",
-              role: "state",
-              name: { de: "Verspätung", en: "Delay" },
-            }
-          );
+          await createStateAsync(dp_Userdata + "FahrplanAnzeiger.Haltestelle" + haltestelle + ".Abfahrt" + String(i) + ".Departure", "00:00", { type: "string", name: { de: "Abfahrzeit", en: "Departure time" }, });
+          await createStateAsync(dp_Userdata + "FahrplanAnzeiger.Haltestelle" + haltestelle + ".Abfahrt" + String(i) + ".Direction", "Hbf", { type: "string", name: { de: "Richtung", en: "Direction" }, });
+          await createStateAsync(dp_Userdata + "FahrplanAnzeiger.Haltestelle" + haltestelle + ".Abfahrt" + String(i) + ".Vehicle", "train", { type: "string", name: { de: "Fahrzeug", en: "Vehicle" }, });
+          await createStateAsync(dp_Userdata + "FahrplanAnzeiger.Haltestelle" + haltestelle + ".Abfahrt" + String(i) + ".Delay", false, { type: "boolean", name: { de: "Verspätung", en: "Delay" }, });
+          setObject(dp_Alias + "FahrplanAnzeiger.Haltestelle" + haltestelle, { type: "device", common: { role: "timeTable", name: { de: "Haltestelle " + haltestelle, en: "Station " + haltestelle, }, }, native: {}, });
+          setObject(dp_Alias + "FahrplanAnzeiger.Haltestelle" + haltestelle + ".Abfahrt" + String(i), { type: "channel", common: { role: "timeTable", name: { de: "Abfahrt " + String(i), en: "Departure " + String(i), }, }, native: {}, });
+          await createAliasAsync(dp_Alias + "FahrplanAnzeiger.Haltestelle" + haltestelle + ".Abfahrt" + String(i) + ".ACTUAL", dp_Userdata + "FahrplanAnzeiger.Haltestelle" + haltestelle + ".Abfahrt" + String(i) + ".Departure",
+            true, <iobJS.StateCommon>{ type: "string", role: "state", name: { de: "Abfahrzeit", en: "Departure time" }, });
+          await createAliasAsync(dp_Alias + "FahrplanAnzeiger.Haltestelle" + haltestelle + ".Abfahrt" + String(i) + ".DIRECTION", dp_Userdata + "FahrplanAnzeiger.Haltestelle" + haltestelle + ".Abfahrt" + String(i) + ".Direction",
+            true, <iobJS.StateCommon>{ type: "string", role: "state", name: { de: "Richtung", en: "Direction" }, });
+          await createAliasAsync(dp_Alias + "FahrplanAnzeiger.Haltestelle" + haltestelle + ".Abfahrt" + String(i) + ".VEHICLE", dp_Userdata + "FahrplanAnzeiger.Haltestelle" + haltestelle + ".Abfahrt" + String(i) + ".Vehicle",
+            true, <iobJS.StateCommon>{ type: "string", role: "state", name: { de: "Fahrzeug", en: "Vehicle" }, });
+          await createAliasAsync(dp_Alias + "FahrplanAnzeiger.Haltestelle" + haltestelle + ".Abfahrt" + String(i) + ".DELAY", dp_Userdata + "FahrplanAnzeiger.Haltestelle" + haltestelle + ".Abfahrt" + String(i) + ".Delay",
+            true, <iobJS.StateCommon>{ type: "boolean", role: "state", name: { de: "Verspätung", en: "Delay" }, });
           log(`Fertig`);
         } else {
           log(`Datenpunkte für Haltestelle ${haltestelle} Abfahrt ${i} vorhanden`);
@@ -155,81 +91,20 @@ async function init_Datenpunkte() {
       for (let i = 0; i < anzahlAbfahrtenRoute; i++) {
         if (existsObject(dp_Userdata + "FahrplanAnzeiger.Route" + route + ".Abfahrt" + String(i)) == false) {
           log(`Datenpunkte für Route ${route} Abfahrt ${i} werden angelegt`);
-          await createStateAsync(dp_Userdata + "FahrplanAnzeiger.Route" + route + ".Abfahrt" + String(i) + ".Departure", "00:00", {
-            type: "string",
-            name: { de: "Abfahrzeit", en: "Departure time" },
-          });
-          await createStateAsync(dp_Userdata + "FahrplanAnzeiger.Route" + route + ".Abfahrt" + String(i) + ".Direction", "Hbf", {
-            type: "string",
-            name: { de: "Richtung", en: "Direction" },
-          });
-          await createStateAsync(dp_Userdata + "FahrplanAnzeiger.Route" + route + ".Abfahrt" + String(i) + ".Vehicle", "train", {
-            type: "string",
-            name: { de: "Fahrzeug", en: "Vehicle" },
-          });
-          await createStateAsync(dp_Userdata + "FahrplanAnzeiger.Route" + route + ".Abfahrt" + String(i) + ".Delay", false, {
-            type: "boolean",
-            name: { de: "Verspätung", en: "Delay" },
-          });
-          setObject(dp_Alias + "FahrplanAnzeiger.Route" + route, {
-            type: "device",
-            common: {
-              role: "timeTable",
-              name: { de: "Route " + route, en: "Route " + route },
-            },
-            native: {},
-          });
-          setObject(dp_Alias + "FahrplanAnzeiger.Route" + route + ".Abfahrt" + String(i), {
-            type: "channel",
-            common: {
-              role: "timeTable",
-              name: {
-                de: "Abfahrt " + String(i),
-                en: "Departure " + String(i),
-              },
-            },
-            native: {},
-          });
-          await createAliasAsync(
-            dp_Alias + "FahrplanAnzeiger.Route" + route + ".Abfahrt" + String(i) + ".ACTUAL",
-            dp_Userdata + "FahrplanAnzeiger.Route" + route + ".Abfahrt" + String(i) + ".Departure",
-            true,
-            <iobJS.StateCommon>{
-              type: "string",
-              role: "state",
-              name: { de: "Abfahrzeit", en: "Departure time" },
-            }
-          );
-          await createAliasAsync(
-            dp_Alias + "FahrplanAnzeiger.Route" + route + ".Abfahrt" + String(i) + ".DIRECTION",
-            dp_Userdata + "FahrplanAnzeiger.Route" + route + ".Abfahrt" + String(i) + ".Direction",
-            true,
-            <iobJS.StateCommon>{
-              type: "string",
-              role: "state",
-              name: { de: "Richtung", en: "Direction" },
-            }
-          );
-          await createAliasAsync(
-            dp_Alias + "FahrplanAnzeiger.Route" + route + ".Abfahrt" + String(i) + ".VEHICLE",
-            dp_Userdata + "FahrplanAnzeiger.Route" + route + ".Abfahrt" + String(i) + ".Vehicle",
-            true,
-            <iobJS.StateCommon>{
-              type: "string",
-              role: "state",
-              name: { de: "Fahrzeug", en: "Vehicle" },
-            }
-          );
-          await createAliasAsync(
-            dp_Alias + "FahrplanAnzeiger.Route" + route + ".Abfahrt" + String(i) + ".DELAY",
-            dp_Userdata + "FahrplanAnzeiger.Route" + route + ".Abfahrt" + String(i) + ".Delay",
-            true,
-            <iobJS.StateCommon>{
-              type: "boolean",
-              role: "state",
-              name: { de: "Verspätung", en: "Delay" },
-            }
-          );
+          await createStateAsync(dp_Userdata + "FahrplanAnzeiger.Route" + route + ".Abfahrt" + String(i) + ".Departure", "00:00", { type: "string", name: { de: "Abfahrzeit", en: "Departure time" }, });
+          await createStateAsync(dp_Userdata + "FahrplanAnzeiger.Route" + route + ".Abfahrt" + String(i) + ".Direction", "Hbf", { type: "string", name: { de: "Richtung", en: "Direction" }, });
+          await createStateAsync(dp_Userdata + "FahrplanAnzeiger.Route" + route + ".Abfahrt" + String(i) + ".Vehicle", "train", { type: "string", name: { de: "Fahrzeug", en: "Vehicle" }, });
+          await createStateAsync(dp_Userdata + "FahrplanAnzeiger.Route" + route + ".Abfahrt" + String(i) + ".Delay", false, { type: "boolean", name: { de: "Verspätung", en: "Delay" }, });
+          setObject(dp_Alias + "FahrplanAnzeiger.Route" + route, { type: "device", common: { role: "timeTable", name: { de: "Route " + route, en: "Route " + route }, }, native: {}, });
+          setObject(dp_Alias + "FahrplanAnzeiger.Route" + route + ".Abfahrt" + String(i), { type: "channel", common: { role: "timeTable", name: { de: "Abfahrt " + String(i), en: "Departure " + String(i), }, }, native: {}, });
+          await createAliasAsync(dp_Alias + "FahrplanAnzeiger.Route" + route + ".Abfahrt" + String(i) + ".ACTUAL", dp_Userdata + "FahrplanAnzeiger.Route" + route + ".Abfahrt" + String(i) + ".Departure",
+            true, <iobJS.StateCommon>{ type: "string", role: "state", name: { de: "Abfahrzeit", en: "Departure time" }, });
+          await createAliasAsync(dp_Alias + "FahrplanAnzeiger.Route" + route + ".Abfahrt" + String(i) + ".DIRECTION", dp_Userdata + "FahrplanAnzeiger.Route" + route + ".Abfahrt" + String(i) + ".Direction",
+            true, <iobJS.StateCommon>{ type: "string", role: "state", name: { de: "Richtung", en: "Direction" }, });
+          await createAliasAsync(dp_Alias + "FahrplanAnzeiger.Route" + route + ".Abfahrt" + String(i) + ".VEHICLE", dp_Userdata + "FahrplanAnzeiger.Route" + route + ".Abfahrt" + String(i) + ".Vehicle",
+            true, <iobJS.StateCommon>{ type: "string", role: "state", name: { de: "Fahrzeug", en: "Vehicle" }, });
+          await createAliasAsync(dp_Alias + "FahrplanAnzeiger.Route" + route + ".Abfahrt" + String(i) + ".DELAY", dp_Userdata + "FahrplanAnzeiger.Route" + route + ".Abfahrt" + String(i) + ".Delay",
+            true, <iobJS.StateCommon>{ type: "boolean", role: "state", name: { de: "Verspätung", en: "Delay" }, });
           log(`Fertig`);
         } else {
           log(`Datenpunkte für Route ${route} Abfahrt ${i} vorhanden`);
@@ -320,17 +195,7 @@ async function json_HaltestelleUmwandeln(json_Haltestelle: string, haltestelle: 
       setState(dp_Userdata + "FahrplanAnzeiger.Haltestelle" + h + ".Abfahrt" + String(i) + ".Vehicle", fahrzeugTyp, true);
       setState(dp_Userdata + "FahrplanAnzeiger.Haltestelle" + h + ".Abfahrt" + String(i) + ".Direction", richtung, true);
 
-      let notifytext: string = [
-        "Der " + fahrzeugNummer + " nach",
-        "\r\n",
-        richtung,
-        "\r\n",
-        "planmäßige Abfahrtzeit " + geplanteUhrzeit,
-        "\r\n",
-        "fährt aktuell um " + uhrzeit + " ab.",
-        "\r\n",
-        "Aktuelle Verspätung beträgt " + minuten + " Minuten.",
-      ].join("");
+      let notifytext: string = ["Der " + fahrzeugNummer + " nach", "\r\n", richtung, "\r\n", "planmäßige Abfahrtzeit " + geplanteUhrzeit, "\r\n", "fährt aktuell um " + uhrzeit + " ab.", "\r\n", "Aktuelle Verspätung beträgt " + minuten + " Minuten.",].join("");
 
       //Bei Verspätung Daten für PopupNotifypage erzeugen und auslösen
       if (timeDelay > verspaetungszeitHaltestelle && verspaetungPopupHaltestelle) {

@@ -1,11 +1,11 @@
 {
-    "editor.formatOnPaste": false, 
-    "editor.formatOnType": false, 
+    "editor.formatOnPaste": false,
+    "editor.formatOnType": false,
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSaveMode": "file", 
-    "files.autoSave": "onFocusChange", 
-    "vs-code-prettier-eslint.prettierLast": false, 
+    "editor.formatOnSaveMode": "file",
+    "files.autoSave": "onFocusChange",
+    "vs-code-prettier-eslint.prettierLast": false,
     "[typescript]": {
         "editor.codeActionsOnSave": {
             "source.organizeImports": "explicit"
