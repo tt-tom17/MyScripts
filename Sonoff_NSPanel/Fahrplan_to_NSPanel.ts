@@ -4,9 +4,10 @@
  * Dieses Skript dient zur freien Verwendung in ioBroker.
  * Jegliche Verantwortung liegt beim Benutzer.
  *
- * Version 1.3.0
+ * Version 1.4.0
  *
- * Setzt NSPanel Script Version 4.3.1.5 oder größer voraus
+ * Setzt NSPanel Script Version 4.6.2 oder größer voraus
+ * und TFT Firmware 55 / 4.6.2
  *
  *  12.10.23 - v1.1.0 - Breaking Change - Datenpunkte an das Panel Script angepasst -> vor dem Start des Scripts alten Ordner "Fahrplananzeiger" aus 0_userdata und Alias.0 löschen
  *  13.10.23 - v1.1.1 - Fix additional info
@@ -16,6 +17,7 @@
  *  28.06.24 - v1.2.1 - Fix checking the number of routes
  *  Breaking change => see you Wiki
  *  01.07.24 - v1.3.0 - Change checking the routes and depatures
+ *  01.04.25 - v1.4.0 - Fix for new cardSchedule
  *
  *
  * auslesen der Daten aus dem Adapter Fahrplan und zusammenstellen für das Sonoff NSPanel
