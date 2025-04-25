@@ -4,7 +4,7 @@
  * Dieses Skript dient zur freien Verwendung in ioBroker.
  * Jegliche Verantwortung liegt beim Benutzer.
  *
- * Version 1.4.0
+ * Version 1.4.1
  *
  * Setzt NSPanel Script Version 4.6.2 oder größer voraus
  * und TFT Firmware 55 / 4.6.2
@@ -18,6 +18,7 @@
  *  Breaking change => see you Wiki
  *  01.07.24 - v1.3.0 - Change checking the routes and depatures
  *  01.04.25 - v1.4.0 - Fix for new cardSchedule
+ *  25.04.25 - v1.4.1 - limit direction string length to 70 characters for NSPanel display
  *
  *
  * auslesen der Daten aus dem Adapter Fahrplan und zusammenstellen für das Sonoff NSPanel
@@ -222,7 +223,7 @@ async function json_HaltestelleUmwandeln(json_Haltestelle: string, haltestelle: 
 
             aktuelleAbfahrzeit = getAttr(abfahrtHaltestelle, 'when');
             geplanteAbfahrzeit = getAttr(abfahrtHaltestelle, 'plannedWhen');
-            richtung = getAttr(abfahrtHaltestelle, 'direction');
+            richtung = getAttr(abfahrtHaltestelle, 'direction').substring(0, 70); // max 70 Zeichen für die Anzeige limit durch NSPanel
             fahrzeugTyp = getAttr(abfahrtHaltestelle, 'line.mode');
             if (fahrzeugMap.has(fahrzeugTyp)) {
                 fahrzeugTyp = fahrzeugMap.get(fahrzeugTyp);
@@ -351,7 +352,7 @@ async function json_RouteUmwandeln(json_Route: string, route: string) {
 
             aktuelleAbfahrzeit = getAttr(abfahrtRoute, 'departure');
             geplanteAbfahrzeit = getAttr(abfahrtRoute, 'plannedDeparture');
-            richtung = getAttr(abfahrtRoute, 'direction');
+            richtung = getAttr(abfahrtRoute, 'direction').substring(0, 70); // max 70 Zeichen für die Anzeige limit durch NSPanel
             fahrzeugTyp = getAttr(abfahrtRoute, 'line.mode');
             if (fahrzeugMap.has(fahrzeugTyp)) {
                 fahrzeugTyp = fahrzeugMap.get(fahrzeugTyp);
